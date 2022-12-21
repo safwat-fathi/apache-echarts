@@ -13,8 +13,9 @@ type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 
 const data = [
   [0, 0, 2, 70],
-  [1, 0, 3, 20],
+  [1, 0, 1, 20],
   [2, 0, 3, 50],
+  [3, 1, 3, 50],
   // [0, 2000, 2001, 70],
   // [1, 2001, 2002, 20],
   // [2, 2000, 2002, 50],
