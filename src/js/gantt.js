@@ -282,6 +282,8 @@ var _mappedData = mapData(_taskData);
 var _zebraData = mapZebra(_taskData);
 var _todayData = [new Date()];
 
+// x: [1, 2, 3, 4],
+// y: 4, //reference of taskid
 var _taskDataDimensions = [
   { name: "index", type: "number" },
   { name: "taskName", type: "ordinal" },
