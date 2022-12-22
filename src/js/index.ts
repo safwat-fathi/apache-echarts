@@ -1,5 +1,6 @@
 import * as echarts from "echarts";
 import moment from "moment";
+console.log(moment("2011-01-01T20:40:33Z").format("YYYY"));
 
 const chartDom = <HTMLElement>document.getElementById("main");
 const myChart = echarts.init(chartDom);
@@ -10,16 +11,26 @@ type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
 type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 
 const timeData = [
-  [0, "2010-05-01T20:40:33Z", "2011-05-01T20:40:33Z", 70],
-  [1, "2011-07-01T20:40:33Z", "2012-05-01T20:40:33Z", 20],
-  [2, "2010-02-01T20:40:33Z", "2013-05-01T20:40:33Z", 50],
-  [3, "2012-10-01T20:40:33Z", "2013-05-01T20:40:33Z", 90],
-  // [0, 0, 3, 70],
-  // [1, 1, 2, 20],
+  [0, "2010", "2011", 70],
+  [1, "2011", "2012", 20],
+  [2, "2010", "2013", 50],
+  [3, "2012", "2013", 90],
+  // [0, 0, 2, 70],
+  // [1, 0, 2, 20],
   // [2, 1, 3, 50],
   // [3, 0, 2, 50],
   // [4, 0, 1, 50],
 ];
+
+// const x1Data = [1, 2];
+// const x1Data = [
+//   "2010-01-01T20:40:33Z",
+//   "2011-01-01T20:40:33Z",
+//   "2012-01-01T20:40:33Z",
+//   "2013-01-01T20:40:33Z",
+// ];
+const x2Data = [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4];
+// const x2Data = ["2010-01-01T20:40:33Z", "2012-01-01T20:40:33Z"];
 
 const renderItem = (
   params: RenderItemParams,
@@ -70,14 +81,25 @@ const renderItem = (
   };
 };
 
-const seriesLabel = {
-  show: true,
-} as const;
+function xAxisLabelFormatter(value?: any, index?: number) {
+  // console.log(index, value);
+
+  const year = moment(value).format("YYYY");
+  const q = moment(value).format("Q");
+  // if the same year show none
+  // next year show year only
+  console.log(year, q);
+  return year;
+  // return moment(value).format("YYYY");
+  // return moment(value).format();
+}
 
 const option: EChartsOption = {
   title: {
     text: "Weather Statistics",
   },
+  // baseOption
+
   // tooltip: {
   //   trigger: "axis",
   //   axisPointer: {
@@ -95,38 +117,23 @@ const option: EChartsOption = {
     {
       type: "time",
       position: "top",
-      // data: [1, 2, 3],
-      data: [
-        "2010-01-01T20:40:33Z",
-        "2011-01-01T20:40:33Z",
-        "2012-01-01T20:40:33Z",
-      ],
-
-      // type: "time",
-      interval: 1,
       axisLine: {
         show: false,
       },
-      // axisLabel: {
-      //   formatter: function (value: any) {
-      //     return moment(value).format("YYYY");
-      //   },
-      //   // interval: 1,
+      // minorTick: { show: true, length: 1 },
+      axisTick: { show: false },
+      // interval: 4,
+      // axisTick: {
+      //   alignWithLabel: false,
+      //   length: 10,
+      //   // align: "left",
+      //   // interval: function (index, value) {
+      //   //   return value ? true : false;
+      //   // },
       // },
-      axisTick: {
-        alignWithLabel: false,
-        length: 10,
-        // align: "left",
-        // interval: function (index, value) {
-        //   return value ? true : false;
-        // },
-      },
-      offset: 25,
+      offset: 15,
       axisLabel: {
-        // margin: 30,
-        formatter: function (value: any) {
-          return moment(value).format("YYYY");
-        },
+        // formatter: xAxisLabelFormatter,
       },
       // splitLine: {
       //   show: true,
@@ -136,14 +143,16 @@ const option: EChartsOption = {
       // },
     },
     {
+      // type: "time",
       position: "top",
-      data: [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4],
-      interval: 4,
+      // min: 0,
+      // max: function () {},
+      data: x2Data,
+      // interval: 4,
       axisLabel: {
-        // margin: 30,
-        formatter: function (value: any) {
-          return moment(value).format("Q");
-        },
+        // formatter: function (value: any) {
+        //   return moment(value).format("Q");
+        // },
       },
       splitLine: {
         show: true,
@@ -161,23 +170,26 @@ const option: EChartsOption = {
     axisLabel: { show: false },
     min: 0,
     max: timeData.length,
-
-    // type: "category",
-
-    // inverse: true,
-    // data: ["Sunny", "Cloudy", "Showers"],
+    // // type: "category",
+    // // inverse: true,
+    // // data: ["Sunny", "Cloudy", "Showers"],
   },
+  // dataset: [
+  //   {
+  //     source: timeData,
+  //   },
+  // ],
   series: [
     {
-      name: "workersData",
+      // name: "workersData",
+      // dimensions: [
+      //   // { name: "name", type: "ordinal" },
+      //   { name: "start", type: "ordinal" },
+      //   { name: "end", type: "ordinal" },
+      //   { name: "donePercentage", type: "ordinal" },
+      //   { name: "taskId", type: "ordinal" },
+      // ],
       type: "custom",
-      dimensions: [
-        // { name: "name", type: "ordinal" },
-        { name: "start", type: "number" },
-        { name: "end", type: "number" },
-        { name: "donePercentage", type: "number" },
-        { name: "taskId", type: "number" },
-      ],
       data: timeData,
       encode: {
         x: [0, 1, 2],
@@ -186,7 +198,6 @@ const option: EChartsOption = {
       },
       xAxisIndex: 0,
       renderItem,
-      label: seriesLabel,
     },
   ],
 };
