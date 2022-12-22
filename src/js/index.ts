@@ -29,6 +29,23 @@ const timeData = [
 //   "2012-01-01T20:40:33Z",
 //   "2013-01-01T20:40:33Z",
 // ];
+
+const calculateQuarters = () => {
+  let max = 0;
+  let min = +timeData[0][1];
+
+  timeData.forEach((data) => {
+    if (+data[2] > max) {
+      max = +data[2];
+    }
+
+    if (+data[1] < min) {
+      max = +data[1];
+    }
+  });
+  console.log((max - min) * 4);
+};
+
 const x2Data = [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4];
 // const x2Data = ["2010-01-01T20:40:33Z", "2012-01-01T20:40:33Z"];
 
