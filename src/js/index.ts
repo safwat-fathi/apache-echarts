@@ -1,6 +1,6 @@
 import * as echarts from "echarts";
 import moment from "moment";
-console.log(moment("2011-01-01T20:40:33Z").format("YYYY"));
+// console.log(moment("2011-01-01T20:40:33Z").format("YYYY"));
 
 const chartDom = <HTMLElement>document.getElementById("main");
 const myChart = echarts.init(chartDom);
@@ -15,39 +15,42 @@ const timeData = [
   [1, "2011", "2012", 20],
   [2, "2010", "2013", 50],
   [3, "2012", "2013", 90],
-  // [0, 0, 2, 70],
-  // [1, 0, 2, 20],
-  // [2, 1, 3, 50],
-  // [3, 0, 2, 50],
-  // [4, 0, 1, 50],
 ];
 
-// const x1Data = [1, 2];
-// const x1Data = [
-//   "2010-01-01T20:40:33Z",
-//   "2011-01-01T20:40:33Z",
-//   "2012-01-01T20:40:33Z",
-//   "2013-01-01T20:40:33Z",
-// ];
-
-const calculateQuarters = () => {
+const calculateQuarters = (data: any[]): string[] => {
+  let quarters;
   let max = 0;
   let min = +timeData[0][1];
 
-  timeData.forEach((data) => {
-    if (+data[2] > max) {
-      max = +data[2];
+  // find max & min dates
+  data.forEach((date) => {
+    if (+date[2] > max) {
+      max = +date[2];
     }
 
-    if (+data[1] < min) {
-      max = +data[1];
+    if (+date[1] < min) {
+      max = +date[1];
     }
   });
-  console.log((max - min) * 4);
-};
 
-const x2Data = [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4];
-// const x2Data = ["2010-01-01T20:40:33Z", "2012-01-01T20:40:33Z"];
+  const quartersCount = (max - min) * 4;
+
+  quarters = new Array(quartersCount);
+
+  let i = 0;
+  while (i <= quartersCount - 4) {
+    if (i % 4 === 0) {
+      quarters[i] = "q1";
+      quarters[i + 1] = "q2";
+      quarters[i + 2] = "q3";
+      quarters[i + 3] = "q4";
+    }
+
+    i++;
+  }
+
+  return quarters;
+};
 
 const renderItem = (
   params: RenderItemParams,
@@ -99,16 +102,14 @@ const renderItem = (
 };
 
 function xAxisLabelFormatter(value?: any, index?: number) {
-  // console.log(index, value);
+  console.log(index, new Date(value));
 
   const year = moment(value).format("YYYY");
   const q = moment(value).format("Q");
   // if the same year show none
   // next year show year only
   console.log(year, q);
-  return year;
-  // return moment(value).format("YYYY");
-  // return moment(value).format();
+  return "{yyyy}";
 }
 
 const option: EChartsOption = {
@@ -137,34 +138,39 @@ const option: EChartsOption = {
       axisLine: {
         show: false,
       },
+
       // minorTick: { show: true, length: 1 },
-      axisTick: { show: false },
+      // axisTick: { show: false },
       // interval: 4,
-      // axisTick: {
-      //   alignWithLabel: false,
-      //   length: 10,
-      //   // align: "left",
-      //   // interval: function (index, value) {
-      //   //   return value ? true : false;
-      //   // },
-      // },
+      // boundaryGap: true,
+      axisTick: {
+        alignWithLabel: true,
+        length: 12,
+        // align: "left",
+        // interval: function (index, value) {
+        //   return value ? true : false;
+        // },
+      },
       offset: 15,
       axisLabel: {
-        // formatter: xAxisLabelFormatter,
+        formatter: xAxisLabelFormatter,
+        // rich: {
+        //   yearStyle: {
+        //     // Make yearly text more standing out
+        //     color: "red",
+        //     fontWeight: "bold",
+        //   },
+        // },
       },
-      // splitLine: {
-      //   show: true,
-      //   interval: function (index, value) {
-      //     return value ? true : false;
-      //   },
-      // },
     },
     {
       // type: "time",
+      show: true,
       position: "top",
       // min: 0,
       // max: function () {},
-      data: x2Data,
+      // data: x2Data,
+      data: calculateQuarters(timeData),
       // interval: 4,
       axisLabel: {
         // formatter: function (value: any) {
@@ -174,7 +180,7 @@ const option: EChartsOption = {
       splitLine: {
         show: true,
         interval: function (index, value) {
-          return value === "1" ? true : false;
+          return value === "q1" ? true : false;
         },
       },
       offset: 1,
