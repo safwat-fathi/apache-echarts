@@ -1,6 +1,5 @@
 import * as echarts from "echarts";
 import moment from "moment";
-// console.log(moment("2011-01-01T20:40:33Z").format("YYYY"));
 
 const chartDom = <HTMLElement>document.getElementById("main");
 const myChart = echarts.init(chartDom);
@@ -11,25 +10,28 @@ type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
 type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 
 const timeData = [
-  [0, "2010", "2011", 70],
-  [1, "2011", "2012", 20],
-  [2, "2010", "2013", 50],
-  [3, "2012", "2013", 90],
+  [0, "2010-04-1", "2011-06-07", 70, "Mile Stone 01"],
+  [1, "2011-02-1", "2012-09-19", 20, "Mile Stone 02"],
+  [2, "2012-01-1", "2013-11-11", 50, "Mile Stone 03"],
+  [3, "2011-11-1", "2013-02-1", 90, "Mile Stone 04"],
 ];
 
 const calculateQuarters = (data: any[]): string[] => {
   let quarters;
   let max = 0;
-  let min = +timeData[0][1];
+  let min = +moment(timeData[0][1]).format("YYYY");
 
   // find max & min dates
   data.forEach((date) => {
-    if (+date[2] > max) {
-      max = +date[2];
+    let dateEnd = moment(date[2]).format("YYYY");
+    let dateStart = moment(date[1]).format("YYYY");
+
+    if (+dateEnd > max) {
+      max = +dateEnd;
     }
 
-    if (+date[1] < min) {
-      max = +date[1];
+    if (+dateStart < min) {
+      max = +dateStart;
     }
   });
 
@@ -52,11 +54,13 @@ const calculateQuarters = (data: any[]): string[] => {
   return quarters;
 };
 
-const renderItem = (
+const renderGanttItem = (
   params: RenderItemParams,
   api: RenderItemAPI
 ): RenderItemReturn => {
   const index = api.value(0);
+
+  const text = api.value(4);
 
   const start = api.coord([api.value(1), index]);
   const end = api.coord([api.value(2), index]);
@@ -67,15 +71,55 @@ const renderItem = (
   const x = start[0];
   const y = start[1] - 10;
 
-  // echarts.time.format()
+  const height = 10;
+
   const rectShape = echarts.graphic.clipRectByRect(
     {
-      // x: 200, // x position is always 100
       x,
-      // y: api.coord([0, api.value(0)])[1],
       y,
-      width: width,
-      height: 10,
+      width,
+      height,
+    },
+    {
+      // @ts-ignore
+      x: params.coordSys.x,
+      // @ts-ignore
+      y: params.coordSys.y,
+      // @ts-ignore
+      width: params.coordSys.width,
+      // @ts-ignore
+      height: params.coordSys.height,
+    }
+  );
+
+  console.log(text, "x:", x);
+  console.log(text, "width:", width);
+  console.log(text, "x - (width + 10):", x - (width + 10));
+  const rectText = echarts.graphic.clipRectByRect(
+    {
+      x,
+      y,
+      width,
+      height,
+    },
+    {
+      // @ts-ignore
+      x: params.coordSys.x,
+      // @ts-ignore
+      y: params.coordSys.y,
+      // @ts-ignore
+      width: params.coordSys.width,
+      // @ts-ignore
+      height: params.coordSys.height,
+    }
+  );
+
+  const rectPercent = echarts.graphic.clipRectByRect(
+    {
+      x,
+      y,
+      width: (width * +percentage) / 100,
+      height,
     },
     {
       // @ts-ignore
@@ -90,31 +134,66 @@ const renderItem = (
   );
 
   return {
-    type: "rect",
-    // textContent: "fwfwfwf",
-    // textContent: "f",
-    shape: rectShape,
-    style: {
-      fill: "blue",
-      stroke: "red",
-    },
+    type: "group",
+    children: [
+      {
+        type: "rect",
+        ignore: !rectShape,
+        shape: rectShape,
+        style: {
+          fill: "#ccc",
+          stroke: "black",
+        },
+      },
+      {
+        type: "rect",
+        ignore: !rectText,
+        shape: rectText,
+        style: {
+          fill: "transparent",
+          // @ts-ignore
+          // textFill: "black",
+          // @ts-ignore
+          text: text,
+        },
+      },
+      {
+        type: "rect",
+        ignore: !rectPercent,
+        shape: rectPercent,
+        style: {
+          fill: "green",
+          stroke: "transparent",
+        },
+      },
+      // {
+      //   type: "rect",
+      //   ignore: !rectText,
+      //   shape: rectText,
+      //   style: {
+      //     fill: "green",
+      //     stroke: "transparent",
+      //   },
+      // },
+    ],
   };
 };
 
 function xAxisLabelFormatter(value?: any, index?: number) {
-  console.log(index, new Date(value));
+  console.log("value", new Date(value));
+  console.log("index", index);
 
   const year = moment(value).format("YYYY");
   const q = moment(value).format("Q");
   // if the same year show none
   // next year show year only
-  console.log(year, q);
-  return "{yyyy}";
+  // console.log(year, q);
+  return year === "2010" ? "{yyyy}" : "";
 }
 
 const option: EChartsOption = {
   title: {
-    text: "Weather Statistics",
+    // text: "Weather Statistics",
   },
   // baseOption
 
@@ -135,14 +214,11 @@ const option: EChartsOption = {
     {
       type: "time",
       position: "top",
+      min: "2010",
+      max: "2013",
       axisLine: {
         show: false,
       },
-
-      // minorTick: { show: true, length: 1 },
-      // axisTick: { show: false },
-      // interval: 4,
-      // boundaryGap: true,
       axisTick: {
         alignWithLabel: true,
         length: 12,
@@ -153,14 +229,7 @@ const option: EChartsOption = {
       },
       offset: 15,
       axisLabel: {
-        formatter: xAxisLabelFormatter,
-        // rich: {
-        //   yearStyle: {
-        //     // Make yearly text more standing out
-        //     color: "red",
-        //     fontWeight: "bold",
-        //   },
-        // },
+        // formatter: xAxisLabelFormatter,
       },
     },
     {
@@ -169,7 +238,6 @@ const option: EChartsOption = {
       position: "top",
       // min: 0,
       // max: function () {},
-      // data: x2Data,
       data: calculateQuarters(timeData),
       // interval: 4,
       axisLabel: {
@@ -193,36 +261,59 @@ const option: EChartsOption = {
     axisLabel: { show: false },
     min: 0,
     max: timeData.length,
-    // // type: "category",
-    // // inverse: true,
-    // // data: ["Sunny", "Cloudy", "Showers"],
   },
-  // dataset: [
-  //   {
-  //     source: timeData,
-  //   },
-  // ],
   series: [
     {
-      // name: "workersData",
-      // dimensions: [
-      //   // { name: "name", type: "ordinal" },
-      //   { name: "start", type: "ordinal" },
-      //   { name: "end", type: "ordinal" },
-      //   { name: "donePercentage", type: "ordinal" },
-      //   { name: "taskId", type: "ordinal" },
-      // ],
+      name: "workersData",
       type: "custom",
       data: timeData,
       encode: {
+        // label: 0,
         x: [0, 1, 2],
-        y: 0, //reference of taskid
-        // tooltip: [0, 1, 2],
+        y: 0, // reference of index
       },
       xAxisIndex: 0,
-      renderItem,
+      renderItem: renderGanttItem,
     },
   ],
 };
+// const data = [
+//   ["2018-04-10T20:40:33Z", 1, 5],
+//   ["2018-04-10T20:40:53Z", 2, 3],
+//   ["2018-04-10T20:41:03Z", 4, 2],
+//   ["2018-04-10T20:44:03Z", 5, 1],
+//   ["2018-04-10T20:45:03Z", 6, 0],
+// ];
+
+// const option: EChartsOption = {
+//   legend: {},
+//   tooltip: {
+//     trigger: "axis",
+//   },
+//   dataset: {
+//     source: data,
+//     dimensions: ["timestamp", "sensor1", "sensor2"],
+//   },
+//   xAxis: { type: "time" },
+//   yAxis: {},
+//   series: [
+//     {
+//       name: "sensor1",
+//       type: "line",
+//       encode: {
+//         x: "timestamp",
+//         y: "sensor1", // refer sensor 1 value
+//       },
+//     },
+//     {
+//       name: "sensor2",
+//       type: "line",
+//       encode: {
+//         x: "timestamp",
+//         y: "sensor2",
+//       },
+//     },
+//   ],
+// };
 
 myChart.setOption(option);
