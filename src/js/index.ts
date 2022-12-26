@@ -9,11 +9,14 @@ type RenderItemParams = echarts.CustomSeriesRenderItemParams;
 type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
 type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 
+const HEIGHT_RATIO = 0.4;
+
 const timeData = [
-  [0, "2010-04-1", "2011-06-07", 70, "Mile Stone 01"],
-  [1, "2011-02-1", "2012-09-19", 20, "Mile Stone 02"],
-  [2, "2012-01-1", "2013-11-11", 50, "Mile Stone 03"],
-  [3, "2011-11-1", "2013-02-1", 90, "Mile Stone 04"],
+  [0, "2010-04-1", "2011-06-07", 70],
+  [1, "2011-02-1", "2012-09-19", 20],
+  [2, "2010-05-1", "2012-12-01", 50],
+  [3, "2011-11-1", "2013-01-1", 90],
+  [4, "2010-11-1", "2013-01-1", 60],
 ];
 
 const calculateQuarters = (data: any[]): string[] => {
@@ -60,18 +63,17 @@ const renderGanttItem = (
 ): RenderItemReturn => {
   const index = api.value(0);
 
-  const text = api.value(4);
+  // const text = api.value(4);
 
   const start = api.coord([api.value(1), index]);
   const end = api.coord([api.value(2), index]);
   const percentage = api.value(3);
   const width = end[0] - start[0];
 
-  // const x = 100;
+  // @ts-ignore
+  const height = api.size([0, 1])[1] * 0.5;
   const x = start[0];
-  const y = start[1] - 10;
-
-  const height = 10;
+  const y = start[1] - height;
 
   const rectShape = echarts.graphic.clipRectByRect(
     {
@@ -92,9 +94,9 @@ const renderGanttItem = (
     }
   );
 
-  console.log(text, "x:", x);
-  console.log(text, "width:", width);
-  console.log(text, "x - (width + 10):", x - (width + 10));
+  // console.log(text, "x:", x);
+  // console.log(text, "width:", width);
+  // console.log(text, "x - (width + 10):", x - (width + 10));
   const rectText = echarts.graphic.clipRectByRect(
     {
       x,
@@ -154,7 +156,7 @@ const renderGanttItem = (
           // @ts-ignore
           // textFill: "black",
           // @ts-ignore
-          text: text,
+          text: `Milestone 0${index + 1}`,
         },
       },
       {
@@ -229,6 +231,13 @@ const option: EChartsOption = {
       },
       offset: 15,
       axisLabel: {
+        align: "center",
+        color: "red",
+        inside: false,
+        verticalAlign: "bottom",
+        showMinLabel: true,
+        showMaxLabel: true,
+        // rotate: 30,
         // formatter: xAxisLabelFormatter,
       },
     },
@@ -261,6 +270,7 @@ const option: EChartsOption = {
     axisLabel: { show: false },
     min: 0,
     max: timeData.length,
+    // inverse: true, // reverse order of data
   },
   series: [
     {
