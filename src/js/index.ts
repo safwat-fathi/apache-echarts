@@ -9,36 +9,38 @@ type RenderItemParams = echarts.CustomSeriesRenderItemParams;
 type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
 type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 
-const HEIGHT_RATIO = 0.4;
+const HEIGHT_RATIO = 0.5;
+const MIN = "2010";
+const MAX = "2014";
 
 const timeData = [
   [0, "2010-04-1", "2011-06-07", 70],
   [1, "2011-02-1", "2012-09-19", 20],
   [2, "2010-05-1", "2012-12-01", 50],
-  [3, "2011-11-1", "2013-01-1", 90],
+  [3, "2011-11-1", "2013-05-1", 90],
   [4, "2010-11-1", "2013-01-1", 60],
 ];
 
 const calculateQuarters = (data: any[]): string[] => {
   let quarters;
-  let max = 0;
-  let min = +moment(timeData[0][1]).format("YYYY");
+  // let max = 0;
+  // let min = +moment(timeData[0][1]).format("YYYY");
 
-  // find max & min dates
-  data.forEach((date) => {
-    let dateEnd = moment(date[2]).format("YYYY");
-    let dateStart = moment(date[1]).format("YYYY");
+  // // find max & min dates
+  // data.forEach((date) => {
+  //   let dateEnd = moment(date[2]).format("YYYY");
+  //   let dateStart = moment(date[1]).format("YYYY");
 
-    if (+dateEnd > max) {
-      max = +dateEnd;
-    }
+  //   if (+dateEnd > max) {
+  //     max = +dateEnd;
+  //   }
 
-    if (+dateStart < min) {
-      max = +dateStart;
-    }
-  });
+  //   if (+dateStart < min) {
+  //     max = +dateStart;
+  //   }
+  // });
 
-  const quartersCount = (max - min) * 4;
+  const quartersCount = (+MAX - +MIN) * 4;
 
   quarters = new Array(quartersCount);
 
@@ -71,7 +73,7 @@ const renderGanttItem = (
   const width = end[0] - start[0];
 
   // @ts-ignore
-  const height = api.size([0, 1])[1] * 0.5;
+  const height = api.size([0, 1])[1] * HEIGHT_RATIO;
   const x = start[0];
   const y = start[1] - height;
 
@@ -182,81 +184,54 @@ const renderGanttItem = (
 };
 
 function xAxisLabelFormatter(value?: any, index?: number) {
-  console.log("value", new Date(value));
-  console.log("index", index);
-
   const year = moment(value).format("YYYY");
   const q = moment(value).format("Q");
+  if (+q === 1) {
+    console.log("index", year, "start of label");
+  } else {
+    console.log("index", year, "quarters");
+  }
   // if the same year show none
   // next year show year only
   // console.log(year, q);
-  return year === "2010" ? "{yyyy}" : "";
+  return +q === 1 ? "{yyyy}" : "";
 }
 
 const option: EChartsOption = {
-  title: {
-    // text: "Weather Statistics",
+  grid: {
+    top: 100,
   },
-  // baseOption
-
-  // tooltip: {
-  //   trigger: "axis",
-  //   axisPointer: {
-  //     type: "shadow",
-  //   },
-  // },
-  // legend: {
-  //   data: ["City Alpha", "City Beta", "City Gamma"],
-  // },
-  // grid: {
-  //   top: 100,
-  //   left: 100,
-  // },
   xAxis: [
     {
       type: "time",
       position: "top",
-      min: "2010",
-      max: "2013",
+      min: MIN,
+      max: MAX,
       axisLine: {
         show: false,
       },
-      axisTick: {
-        alignWithLabel: true,
-        length: 12,
-        // align: "left",
-        // interval: function (index, value) {
-        //   return value ? true : false;
-        // },
-      },
-      offset: 15,
+      offset: 25,
       axisLabel: {
         align: "center",
-        color: "red",
-        inside: false,
-        verticalAlign: "bottom",
+        color: "#fff",
+        fontWeight: "bold",
+        backgroundColor: "blue",
+        borderRadius: 5,
+        height: 10,
+        width: 25,
+        padding: 10,
         showMinLabel: true,
         showMaxLabel: true,
-        // rotate: 30,
         // formatter: xAxisLabelFormatter,
       },
     },
     {
-      // type: "time",
       show: true,
       position: "top",
-      // min: 0,
-      // max: function () {},
       data: calculateQuarters(timeData),
-      // interval: 4,
-      axisLabel: {
-        // formatter: function (value: any) {
-        //   return moment(value).format("Q");
-        // },
-      },
       splitLine: {
         show: true,
-        interval: function (index, value) {
+        interval: function (_, value) {
           return value === "q1" ? true : false;
         },
       },
@@ -278,7 +253,6 @@ const option: EChartsOption = {
       type: "custom",
       data: timeData,
       encode: {
-        // label: 0,
         x: [0, 1, 2],
         y: 0, // reference of index
       },
@@ -287,6 +261,7 @@ const option: EChartsOption = {
     },
   ],
 };
+
 // const data = [
 //   ["2018-04-10T20:40:33Z", 1, 5],
 //   ["2018-04-10T20:40:53Z", 2, 3],
