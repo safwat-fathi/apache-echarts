@@ -1,3 +1,12 @@
+/*  
+	TODO: add custom image on every bar with text. (weather statistics ex.)
+	TODO: hover over grid highlights bar on graph.
+	TODO: rich axis label. (weather statistics ex.)
+	TODO: add bar label on start of the bar.
+	TODO: show current date as vertical line.
+	TODO: switch to change grid from (monthly- yearly weekly).
+ */
+
 import * as echarts from "echarts";
 import moment from "moment";
 
@@ -197,7 +206,7 @@ const option: EChartsOption = {
       handleSize: 0,
       showDetail: false,
     },
-    // Y axis scroll inside chart coordinates
+    // Y axis scroll inside grid
     {
       type: "inside",
       id: "insideY",
