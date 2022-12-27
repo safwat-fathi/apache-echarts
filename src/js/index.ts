@@ -14,11 +14,21 @@ const MIN = "2010";
 const MAX = "2014";
 
 const timeData = [
-  [0, "2010-04-1", "2011-06-07", 70],
+  [0, "2010-04-1", "2011-06-07", 100],
   [1, "2011-02-1", "2012-09-19", 20],
   [2, "2010-05-1", "2012-12-01", 50],
   [3, "2011-11-1", "2013-05-1", 90],
   [4, "2010-11-1", "2013-01-1", 60],
+  [5, "2010-11-1", "2013-01-1", 60],
+  [6, "2010-11-1", "2013-01-1", 60],
+  [7, "2010-11-1", "2013-01-1", 60],
+  [8, "2010-11-1", "2013-01-1", 60],
+  [9, "2010-11-1", "2013-01-1", 60],
+  [10, "2010-11-1", "2013-01-1", 60],
+  [11, "2010-11-1", "2013-01-1", 60],
+  [12, "2010-11-1", "2013-01-1", 60],
+  [13, "2010-11-1", "2013-01-1", 60],
+  [14, "2010-11-1", "2013-01-1", 60],
 ];
 
 const calculateQuarters = (data: any[]): string[] => {
@@ -60,6 +70,8 @@ const renderGanttItem = (
   const height = api.size([0, 1])[1] * HEIGHT_RATIO;
   const x = start[0];
   const y = start[1] - height;
+  // @ts-ignore
+  console.log("params.coordSys.x", params.coordSys.x);
 
   const rectShape = echarts.graphic.clipRectByRect(
     {
@@ -163,6 +175,31 @@ const option: EChartsOption = {
   grid: {
     top: 100,
   },
+  dataZoom: [
+    {
+      type: "slider",
+      yAxisIndex: 0,
+      zoomLock: true,
+      width: 10,
+      right: 10,
+      top: 100,
+      bottom: 85,
+      start: 0,
+      end: 30,
+      handleSize: 0,
+      showDetail: false,
+    },
+    {
+      type: "inside",
+      id: "insideY",
+      yAxisIndex: 0,
+      start: 0,
+      end: 30,
+      zoomOnMouseWheel: false,
+      moveOnMouseMove: true,
+      moveOnMouseWheel: true,
+    },
+  ],
   xAxis: [
     {
       type: "time",
