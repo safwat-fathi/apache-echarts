@@ -11,30 +11,34 @@ type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 
 const HEIGHT_RATIO = 0.5;
 const MIN = "2010";
-const MAX = "2014";
+const MAX = "2022";
 
 const timeData = [
-  [0, "2010-04-1", "2011-06-07", 100],
-  [1, "2011-02-1", "2012-09-19", 20],
-  [2, "2010-05-1", "2012-12-01", 50],
-  [3, "2011-11-1", "2013-05-1", 90],
-  [4, "2010-11-1", "2013-01-1", 60],
-  [5, "2010-11-1", "2013-01-1", 60],
-  [6, "2010-11-1", "2013-01-1", 60],
-  [7, "2010-11-1", "2013-01-1", 60],
-  [8, "2010-11-1", "2013-01-1", 60],
-  [9, "2010-11-1", "2013-01-1", 60],
-  [10, "2010-11-1", "2013-01-1", 60],
-  [11, "2010-11-1", "2013-01-1", 60],
-  [12, "2010-11-1", "2013-01-1", 60],
-  [13, "2010-11-1", "2013-01-1", 60],
-  [14, "2010-11-1", "2013-01-1", 60],
+  [0, "2017-04-1", "2020-06-07", 100],
+  [1, "2011-02-1", "2013-09-19", 20],
+  [2, "2017-05-1", "2017-12-01", 50],
+  [3, "2011-11-1", "2019-05-1", 90],
+  [4, "2019-11-1", "2022-01-1", 60],
+  [5, "2011-11-1", "2013-01-1", 80],
+  [6, "2015-01-1", "2019-11-1", 80],
+  [7, "2013-01-1", "2014-11-1", 40],
+  [8, "2010-11-1", "2013-01-1", 90],
+  [9, "2010-02-1", "2013-01-1", 100],
+  [10, "2010-05-1", "2013-08-1", 60],
+  [11, "2010-12-1", "2013-12-1", 30],
+  [12, "2011-09-1", "2018-02-1", 70],
+  [13, "2019-02-1", "2020-08-1", 10],
+  [14, "2016-11-1", "2022-02-1", 0],
 ];
 
 const calculateQuarters = (data: any[]): string[] => {
   let quarters;
 
   const quartersCount = (+MAX - +MIN) * 4;
+  console.log(
+    "🚀 ~ file: index.ts:38 ~ calculateQuarters ~ quartersCount",
+    quartersCount
+  );
 
   quarters = new Array(quartersCount);
 
@@ -50,6 +54,10 @@ const calculateQuarters = (data: any[]): string[] => {
     i++;
   }
 
+  console.log(
+    "🚀 ~ file: index.ts:63 ~ calculateQuarters ~ quarters",
+    quarters
+  );
   return quarters;
 };
 
@@ -176,19 +184,20 @@ const option: EChartsOption = {
     top: 100,
   },
   dataZoom: [
+    // Y axis scroll with slider
     {
       type: "slider",
       yAxisIndex: 0,
-      zoomLock: true,
       width: 10,
       right: 10,
       top: 100,
-      bottom: 85,
+      bottom: 80,
       start: 0,
       end: 30,
       handleSize: 0,
       showDetail: false,
     },
+    // Y axis scroll inside chart coordinates
     {
       type: "inside",
       id: "insideY",
@@ -198,6 +207,16 @@ const option: EChartsOption = {
       zoomOnMouseWheel: false,
       moveOnMouseMove: true,
       moveOnMouseWheel: true,
+    },
+    // X axis scroll & zoom with slider
+    {
+      type: "slider",
+      xAxisIndex: [0, 1],
+      height: 20,
+      bottom: 40,
+      start: 0,
+      end: 30,
+      showDetail: false,
     },
   ],
   xAxis: [
