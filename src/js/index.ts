@@ -23,22 +23,6 @@ const timeData = [
 
 const calculateQuarters = (data: any[]): string[] => {
   let quarters;
-  // let max = 0;
-  // let min = +moment(timeData[0][1]).format("YYYY");
-
-  // // find max & min dates
-  // data.forEach((date) => {
-  //   let dateEnd = moment(date[2]).format("YYYY");
-  //   let dateStart = moment(date[1]).format("YYYY");
-
-  //   if (+dateEnd > max) {
-  //     max = +dateEnd;
-  //   }
-
-  //   if (+dateStart < min) {
-  //     max = +dateStart;
-  //   }
-  // });
 
   const quartersCount = (+MAX - +MIN) * 4;
 
@@ -96,9 +80,6 @@ const renderGanttItem = (
     }
   );
 
-  // console.log(text, "x:", x);
-  // console.log(text, "width:", width);
-  // console.log(text, "x - (width + 10):", x - (width + 10));
   const rectText = echarts.graphic.clipRectByRect(
     {
       x,
@@ -156,8 +137,6 @@ const renderGanttItem = (
         style: {
           fill: "transparent",
           // @ts-ignore
-          // textFill: "black",
-          // @ts-ignore
           text: `Milestone 0${index + 1}`,
         },
       },
@@ -170,32 +149,15 @@ const renderGanttItem = (
           stroke: "transparent",
         },
       },
-      // {
-      //   type: "rect",
-      //   ignore: !rectText,
-      //   shape: rectText,
-      //   style: {
-      //     fill: "green",
-      //     stroke: "transparent",
-      //   },
-      // },
     ],
   };
 };
 
-function xAxisLabelFormatter(value?: any, index?: number) {
-  const year = moment(value).format("YYYY");
+const xAxisLabelFormatter = (value: any) => {
   const q = moment(value).format("Q");
-  if (+q === 1) {
-    console.log("index", year, "start of label");
-  } else {
-    console.log("index", year, "quarters");
-  }
-  // if the same year show none
-  // next year show year only
-  // console.log(year, q);
+
   return +q === 1 ? "{yyyy}" : "";
-}
+};
 
 const option: EChartsOption = {
   grid: {
@@ -222,7 +184,7 @@ const option: EChartsOption = {
         padding: 10,
         showMinLabel: true,
         showMaxLabel: true,
-        // formatter: xAxisLabelFormatter,
+        formatter: xAxisLabelFormatter,
       },
     },
     {
@@ -245,7 +207,6 @@ const option: EChartsOption = {
     axisLabel: { show: false },
     min: 0,
     max: timeData.length,
-    // inverse: true, // reverse order of data
   },
   series: [
     {
@@ -261,44 +222,5 @@ const option: EChartsOption = {
     },
   ],
 };
-
-// const data = [
-//   ["2018-04-10T20:40:33Z", 1, 5],
-//   ["2018-04-10T20:40:53Z", 2, 3],
-//   ["2018-04-10T20:41:03Z", 4, 2],
-//   ["2018-04-10T20:44:03Z", 5, 1],
-//   ["2018-04-10T20:45:03Z", 6, 0],
-// ];
-
-// const option: EChartsOption = {
-//   legend: {},
-//   tooltip: {
-//     trigger: "axis",
-//   },
-//   dataset: {
-//     source: data,
-//     dimensions: ["timestamp", "sensor1", "sensor2"],
-//   },
-//   xAxis: { type: "time" },
-//   yAxis: {},
-//   series: [
-//     {
-//       name: "sensor1",
-//       type: "line",
-//       encode: {
-//         x: "timestamp",
-//         y: "sensor1", // refer sensor 1 value
-//       },
-//     },
-//     {
-//       name: "sensor2",
-//       type: "line",
-//       encode: {
-//         x: "timestamp",
-//         y: "sensor2",
-//       },
-//     },
-//   ],
-// };
 
 myChart.setOption(option);
