@@ -267,7 +267,7 @@ const option: EChartsOption = {
       },
       offset: 25,
       axisLabel: {
-        align: "center",
+        // align: "center",
         color: "#fff",
         fontWeight: "bold",
         backgroundColor: "blue",
@@ -313,7 +313,7 @@ const option: EChartsOption = {
       xAxisIndex: 0,
       renderItem: renderGanttItem,
     },
-    // marker of current date
+    // marker for current date
     {
       type: "line",
       xAxisIndex: 0,
@@ -322,7 +322,8 @@ const option: EChartsOption = {
         label: {
           show: false,
         },
-        symbol: "none",
+        symbol: "rect",
+        symbolRotate: 90,
         lineStyle: {
           color: "blue",
         },
