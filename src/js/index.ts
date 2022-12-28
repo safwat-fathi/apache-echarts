@@ -1,5 +1,5 @@
 /*  
-	TODO: 	add custom image on every bar with text. (weather statistics ex.)
+	TODO: ✔ *needs enhancement*	add custom image on every bar with text. (weather statistics ex.) 
 	TODO: ✔ hover over grid highlights bar on graph.
 	TODO: 	rich axis label. (weather statistics ex.)
 	TODO: 	add bar label on start of the bar.
@@ -70,12 +70,14 @@ const renderGanttItem = (
   const start = api.coord([api.value(1), index]);
   const end = api.coord([api.value(2), index]);
   const percentage = api.value(3);
+	const employeeName = api.value(4);
   const width = end[0] - start[0];
 
   // @ts-ignore
   const height = api.size([0, 1])[1] * HEIGHT_RATIO;
   const x = start[0];
   const y = start[1] - height;
+  const imagePosition = x + width + 30;
 
   const rectShape = echarts.graphic.clipRectByRect(
     {
@@ -163,6 +165,30 @@ const renderGanttItem = (
         style: {
           fill: "green",
           stroke: "transparent",
+        },
+      },
+      {
+        type: "image",
+        style: {
+          image:
+            "https://cdn.xxl.thumbs.canstockphoto.com/avatar-flat-style-vector-icon-user-sign-icon-human-avatar-black-icon-vector-illustration-image_csp70665772.jpg",
+          x: imagePosition,
+          y,
+          width: height,
+          height,
+        },
+      },
+      {
+        type: "text",
+        style: {
+          text: String(employeeName),
+          x: imagePosition + 65,
+          y: y + (height / 3),
+          // height,
+          // align: "center",
+          fontSize: 20,
+          // width: height,
+          // height,
         },
       },
     ],
