@@ -3,10 +3,10 @@
 	TODO: ✔ hover over grid highlights bar on graph.
 	TODO: 	rich axis label. (weather statistics ex.)
 	TODO: 	add bar label on start of the bar.
-	TODO: ✔ show current date as vertical line.
+	TODO: ✔ show current date as marker line.
 	TODO: 	switch to change grid from (monthly- yearly weekly).
-	TODO: ✔ scroll grid vertically
-	TODO: ✔ scroll grid horizontally
+	TODO: ✔ scroll grid vertically.
+	TODO: ✔ scroll grid horizontally.
  */
 
 import * as echarts from "echarts";
@@ -25,27 +25,25 @@ const MIN = "2010";
 const MAX = "2022";
 
 const timeData = [
-  [0, "2017-04-1", "2020-06-07", 100],
-  [1, "2011-02-1", "2013-09-19", 20],
-  [2, "2017-05-1", "2017-12-01", 50],
-  [3, "2011-11-1", "2019-05-1", 90],
-  [4, "2019-11-1", "2022-01-1", 60],
-  [5, "2011-11-1", "2013-01-1", 80],
-  [6, "2015-01-1", "2019-11-1", 80],
-  [7, "2013-01-1", "2014-11-1", 40],
-  [8, "2010-11-1", "2013-01-1", 90],
-  [9, "2010-02-1", "2013-01-1", 100],
-  [10, "2010-05-1", "2013-08-1", 60],
-  [11, "2010-12-1", "2013-12-1", 30],
-  [12, "2011-09-1", "2018-02-1", 70],
-  [13, "2019-02-1", "2020-08-1", 10],
-  [14, "2016-11-1", "2022-02-1", 0],
+  [0, "2017-04-1", "2020-06-07", 100, "Ali"],
+  [1, "2011-02-1", "2013-09-19", 20, "Omar"],
+  [2, "2017-05-1", "2017-12-01", 50, "Mostafa"],
+  [3, "2011-11-1", "2019-05-1", 90, "Khaled"],
+  [4, "2019-11-1", "2022-01-1", 60, "Karam"],
+  [5, "2011-11-1", "2013-01-1", 80, "Safwat"],
+  [6, "2015-01-1", "2019-11-1", 80, "Anas"],
+  [7, "2013-01-1", "2014-11-1", 40, "Kareem"],
+  [8, "2010-11-1", "2013-01-1", 90, "Lamyaa"],
+  [9, "2010-02-1", "2013-01-1", 100, "Sara"],
+  [10, "2010-05-1", "2013-08-1", 60, "Ola"],
+  [11, "2010-12-1", "2013-12-1", 30, "Tarek"],
+  [14, "2016-11-1", "2022-02-1", 0, "Mahmoud"],
 ];
 
-const calculateQuarters = (data: any[]): string[] => {
+const calculateQuarters = (min: number, max: number): string[] => {
   let quarters;
 
-  const quartersCount = (+MAX - +MIN) * 4;
+  const quartersCount = (max - min) * 4;
   quarters = new Array(quartersCount);
 
   let i = 0;
@@ -59,38 +57,8 @@ const calculateQuarters = (data: any[]): string[] => {
 
     i++;
   }
+
   return quarters;
-};
-
-const renderCurrentDate = (
-  params: RenderItemParams,
-  api: RenderItemAPI
-): RenderItemReturn => {
-  const start = api.coord([api.value(0), api.value(1)]);
-  console.log("🚀 ~ file: index.ts:67 ~ start", start);
-  const end = api.coord([api.value(1), api.value(2)]);
-  console.log("🚀 ~ file: index.ts:69 ~ end", end);
-
-  const x1 = start[0];
-  const y1 = start[1];
-  const x2 = end[0];
-  const y2 = end[1];
-
-  const line = {
-    type: "line",
-    shape: { x1, y1, x2, y2 },
-    style: {
-      stroke: "blue",
-      lineWidth: 4,
-      lineDash: [2], // put dash, gap values here
-    },
-  };
-
-  return {
-    type: "group",
-    // @ts-ignore
-    children: [line],
-  };
 };
 
 const renderGanttItem = (
@@ -216,6 +184,15 @@ const option: EChartsOption = {
       type: "shadow",
     },
     position: (point: number[]) => [point[0], point[1] + 20],
+    formatter: function (params: any) {
+      const data = params[0].data;
+
+      return `<b>Milestone</b>: ${data[0] + 1}<br /><b>From period</b>: ${
+        data[1]
+      } to ${data[2]}<br /><b>Done percentage</b>: ${
+        data[3]
+      }<br /><b>For employee</b>: ${data[4]}`;
+    },
   },
   grid: {
     top: 100,
@@ -231,7 +208,6 @@ const option: EChartsOption = {
       bottom: 80,
       start: 0,
       end: 30,
-      handleSize: 0,
       showDetail: false,
     },
     // Y axis scroll inside grid
@@ -249,7 +225,7 @@ const option: EChartsOption = {
     {
       type: "slider",
       xAxisIndex: [0, 1],
-      height: 20,
+      height: 10,
       bottom: 40,
       start: 0,
       end: 30,
@@ -283,7 +259,7 @@ const option: EChartsOption = {
     {
       show: true,
       position: "top",
-      data: calculateQuarters(timeData),
+      data: calculateQuarters(+MIN, +MAX),
       splitLine: {
         show: true,
         interval: function (_, value) {
