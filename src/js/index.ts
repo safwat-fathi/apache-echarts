@@ -1,10 +1,12 @@
 /*  
-	TODO: add custom image on every bar with text. (weather statistics ex.)
-	TODO: hover over grid highlights bar on graph.
-	TODO: rich axis label. (weather statistics ex.)
-	TODO: add bar label on start of the bar.
-	TODO: show current date as vertical line.
-	TODO: switch to change grid from (monthly- yearly weekly).
+	TODO: 	add custom image on every bar with text. (weather statistics ex.)
+	TODO: ✔ hover over grid highlights bar on graph.
+	TODO: 	rich axis label. (weather statistics ex.)
+	TODO: 	add bar label on start of the bar.
+	TODO: ✔ show current date as vertical line.
+	TODO: 	switch to change grid from (monthly- yearly weekly).
+	TODO: ✔ scroll grid vertically
+	TODO: ✔ scroll grid horizontally
  */
 
 import * as echarts from "echarts";
@@ -44,11 +46,6 @@ const calculateQuarters = (data: any[]): string[] => {
   let quarters;
 
   const quartersCount = (+MAX - +MIN) * 4;
-  console.log(
-    "🚀 ~ file: index.ts:38 ~ calculateQuarters ~ quartersCount",
-    quartersCount
-  );
-
   quarters = new Array(quartersCount);
 
   let i = 0;
@@ -62,12 +59,38 @@ const calculateQuarters = (data: any[]): string[] => {
 
     i++;
   }
-
-  console.log(
-    "🚀 ~ file: index.ts:63 ~ calculateQuarters ~ quarters",
-    quarters
-  );
   return quarters;
+};
+
+const renderCurrentDate = (
+  params: RenderItemParams,
+  api: RenderItemAPI
+): RenderItemReturn => {
+  const start = api.coord([api.value(0), api.value(1)]);
+  console.log("🚀 ~ file: index.ts:67 ~ start", start);
+  const end = api.coord([api.value(1), api.value(2)]);
+  console.log("🚀 ~ file: index.ts:69 ~ end", end);
+
+  const x1 = start[0];
+  const y1 = start[1];
+  const x2 = end[0];
+  const y2 = end[1];
+
+  const line = {
+    type: "line",
+    shape: { x1, y1, x2, y2 },
+    style: {
+      stroke: "blue",
+      lineWidth: 4,
+      lineDash: [2], // put dash, gap values here
+    },
+  };
+
+  return {
+    type: "group",
+    // @ts-ignore
+    children: [line],
+  };
 };
 
 const renderGanttItem = (
@@ -75,8 +98,6 @@ const renderGanttItem = (
   api: RenderItemAPI
 ): RenderItemReturn => {
   const index = api.value(0);
-
-  // const text = api.value(4);
 
   const start = api.coord([api.value(1), index]);
   const end = api.coord([api.value(2), index]);
@@ -87,8 +108,6 @@ const renderGanttItem = (
   const height = api.size([0, 1])[1] * HEIGHT_RATIO;
   const x = start[0];
   const y = start[1] - height;
-  // @ts-ignore
-  console.log("params.coordSys.x", params.coordSys.x);
 
   const rectShape = echarts.graphic.clipRectByRect(
     {
@@ -189,6 +208,15 @@ const xAxisLabelFormatter = (value: any) => {
 };
 
 const option: EChartsOption = {
+  // @ts-ignore
+  tooltip: {
+    trigger: "axis",
+    axisPointer: {
+      axis: "y",
+      type: "shadow",
+    },
+    position: (point: number[]) => [point[0], point[1] + 20],
+  },
   grid: {
     top: 100,
   },
@@ -275,7 +303,7 @@ const option: EChartsOption = {
   },
   series: [
     {
-      name: "workersData",
+      name: "employees-data",
       type: "custom",
       data: timeData,
       encode: {
@@ -284,6 +312,21 @@ const option: EChartsOption = {
       },
       xAxisIndex: 0,
       renderItem: renderGanttItem,
+    },
+    // marker of current date
+    {
+      type: "line",
+      xAxisIndex: 0,
+      markLine: {
+        data: [{ name: "current date", xAxis: "2011-01-01" }],
+        label: {
+          show: false,
+        },
+        symbol: "none",
+        lineStyle: {
+          color: "blue",
+        },
+      },
     },
   ],
 };
