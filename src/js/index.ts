@@ -1,10 +1,10 @@
 /*  
-	TODO: ✔ *needs enhancement*	add custom image on every bar with text. (weather statistics ex.) 
+	TODO: ✔ *needs enhancement*	add custom image on every bar with text.
 	TODO: ✔ hover over grid highlights bar on graph.
 	TODO: 	rich axis label. (weather statistics ex.)
 	TODO: 	add bar label on start of the bar.
 	TODO: ✔ show current date as marker line.
-	TODO: 	switch to change grid from (monthly- yearly weekly).
+	TODO: 	switch to change grid from (monthly-yearly-weekly).
 	TODO: ✔ scroll grid vertically.
 	TODO: ✔ scroll grid horizontally.
  */
@@ -23,6 +23,10 @@ type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 const HEIGHT_RATIO = 0.5;
 const MIN = "2010";
 const MAX = "2022";
+let barTextPositionVar = 3;
+let barTextFontSize = 20;
+
+// myChart.on("")
 
 const timeData = [
   [0, "2017-04-1", "2020-06-07", 100, "Ali"],
@@ -66,11 +70,10 @@ const renderGanttItem = (
   api: RenderItemAPI
 ): RenderItemReturn => {
   const index = api.value(0);
-
   const start = api.coord([api.value(1), index]);
   const end = api.coord([api.value(2), index]);
   const percentage = api.value(3);
-	const employeeName = api.value(4);
+  const employeeName = api.value(4);
   const width = end[0] - start[0];
 
   // @ts-ignore
@@ -80,25 +83,6 @@ const renderGanttItem = (
   const imagePosition = x + width + 30;
 
   const rectShape = echarts.graphic.clipRectByRect(
-    {
-      x,
-      y,
-      width,
-      height,
-    },
-    {
-      // @ts-ignore
-      x: params.coordSys.x,
-      // @ts-ignore
-      y: params.coordSys.y,
-      // @ts-ignore
-      width: params.coordSys.width,
-      // @ts-ignore
-      height: params.coordSys.height,
-    }
-  );
-
-  const rectText = echarts.graphic.clipRectByRect(
     {
       x,
       y,
@@ -150,21 +134,24 @@ const renderGanttItem = (
       },
       {
         type: "rect",
-        ignore: !rectText,
-        shape: rectText,
-        style: {
-          fill: "transparent",
-          // @ts-ignore
-          text: `Milestone 0${index + 1}`,
-        },
-      },
-      {
-        type: "rect",
         ignore: !rectPercent,
         shape: rectPercent,
         style: {
           fill: "green",
           stroke: "transparent",
+        },
+      },
+      {
+        type: "text",
+        style: {
+          // @ts-ignore
+          text: `Milestone 0${index + 1}`,
+          fill: "#fff",
+          x,
+          y: y + height / barTextPositionVar,
+          width,
+          height,
+          fontSize: barTextFontSize,
         },
       },
       {
@@ -183,12 +170,8 @@ const renderGanttItem = (
         style: {
           text: String(employeeName),
           x: imagePosition + 65,
-          y: y + (height / 3),
-          // height,
-          // align: "center",
-          fontSize: 20,
-          // width: height,
-          // height,
+          y: y + height / barTextPositionVar,
+          fontSize: barTextFontSize,
         },
       },
     ],
