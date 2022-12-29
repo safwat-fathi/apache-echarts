@@ -23,10 +23,27 @@ type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 const HEIGHT_RATIO = 0.5;
 const MIN = "2010";
 const MAX = "2022";
-let barTextPositionVar = 3;
-let barTextFontSize = 20;
 
-// myChart.on("")
+// let currentWidth = myChart.getWidth();
+// let currentHeight = myChart.getHeight();
+
+let xAxisScrollStart = 0;
+let xAxisScrollEnd = 50;
+let yAxisScrollStart = 0;
+let yAxisScrollEnd = 100;
+
+let barTextPositionVar = 7;
+// let barTextFontSize = `${yAxisScrollEnd - yAxisScrollStart - 33}`;
+
+myChart.on("dataZoom", (e: any) => {
+  const start = e.start;
+  const end = e.end;
+  // console.log("🚀 ~ file: index.ts:30 ~ currentWidth", currentWidth);
+  // console.log("🚀 ~ file: index.ts:32 ~ currentHeight", currentHeight);
+  console.log("event:", e);
+  // barTextFontSize = `${end - start - 33}`;
+  // console.log(barTextFontSize);
+});
 
 const timeData = [
   [0, "2017-04-1", "2020-06-07", 100, "Ali"],
@@ -80,7 +97,7 @@ const renderGanttItem = (
   const height = api.size([0, 1])[1] * HEIGHT_RATIO;
   const x = start[0];
   const y = start[1] - height;
-  const imagePosition = x + width + 30;
+  const imagePosition = x + width + 20;
 
   const rectShape = echarts.graphic.clipRectByRect(
     {
@@ -147,11 +164,11 @@ const renderGanttItem = (
           // @ts-ignore
           text: `Milestone 0${index + 1}`,
           fill: "#fff",
-          x,
+          x: x + 20,
           y: y + height / barTextPositionVar,
           width,
           height,
-          fontSize: barTextFontSize,
+          fontSize: 14,
         },
       },
       {
@@ -161,17 +178,17 @@ const renderGanttItem = (
             "https://cdn.xxl.thumbs.canstockphoto.com/avatar-flat-style-vector-icon-user-sign-icon-human-avatar-black-icon-vector-illustration-image_csp70665772.jpg",
           x: imagePosition,
           y,
-          width: height,
-          height,
+          width: height * 0.9,
+          height: height * 0.9,
         },
       },
       {
         type: "text",
         style: {
           text: String(employeeName),
-          x: imagePosition + 65,
+          x: imagePosition + height + 10,
           y: y + height / barTextPositionVar,
-          fontSize: barTextFontSize,
+          fontSize: 14,
         },
       },
     ],
@@ -215,8 +232,8 @@ const option: EChartsOption = {
       right: 10,
       top: 100,
       bottom: 80,
-      start: 0,
-      end: 30,
+      start: yAxisScrollStart,
+      end: yAxisScrollEnd,
       showDetail: false,
     },
     // Y axis scroll inside grid
@@ -224,8 +241,8 @@ const option: EChartsOption = {
       type: "inside",
       id: "insideY",
       yAxisIndex: 0,
-      start: 0,
-      end: 30,
+      start: yAxisScrollStart,
+      end: yAxisScrollEnd,
       zoomOnMouseWheel: false,
       moveOnMouseMove: true,
       moveOnMouseWheel: true,
@@ -236,8 +253,8 @@ const option: EChartsOption = {
       xAxisIndex: [0, 1],
       height: 10,
       bottom: 40,
-      start: 0,
-      end: 30,
+      start: xAxisScrollStart,
+      end: xAxisScrollEnd,
       showDetail: false,
     },
   ],
