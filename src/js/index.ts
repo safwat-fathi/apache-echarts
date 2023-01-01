@@ -1,8 +1,8 @@
 /*  
-	TODO: ✔ *needs enhancement*	add custom image on every bar with text.
+	TODO: ✔ add custom image on every bar with text.
 	TODO: ✔ hover over grid highlights bar on graph.
 	TODO: 	rich axis label. (weather statistics ex.)
-	TODO: 	add bar label on start of the bar.
+	TODO: ✔	add bar label on start of the bar.
 	TODO: ✔ show current date as marker line.
 	TODO: 	switch to change grid from (monthly-yearly-weekly).
 	TODO: ✔ scroll grid vertically.
@@ -12,38 +12,37 @@
 import * as echarts from "echarts";
 import moment from "moment";
 
-const chartDom = <HTMLElement>document.getElementById("main");
-const myChart = echarts.init(chartDom);
-
 type EChartsOption = echarts.EChartsOption;
 type RenderItemParams = echarts.CustomSeriesRenderItemParams;
 type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
 type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 
+// grab btn elements
+const yearBtn = document.getElementById("yearly");
+const monthBtn = document.getElementById("monthly");
+const weekBtn = document.getElementById("weekly");
+const chartDom = <HTMLElement>document.getElementById("main");
+
+const myChart = echarts.init(chartDom);
+
+// globals
 const HEIGHT_RATIO = 0.5;
 const MIN = "2010";
 const MAX = "2022";
 
-// let currentWidth = myChart.getWidth();
-// let currentHeight = myChart.getHeight();
-
+let showQuarters = true;
+let xAxisType: "year" | "month" | "week" = "year";
 let xAxisScrollStart = 0;
 let xAxisScrollEnd = 50;
 let yAxisScrollStart = 0;
 let yAxisScrollEnd = 12;
 
-let barTextPositionVar = 2.2;
-// let barTextFontSize = `${yAxisScrollEnd - yAxisScrollStart - 33}`;
-
-myChart.on("dataZoom", (e: any) => {
-  const start = e.start;
-  const end = e.end;
-  // console.log("🚀 ~ file: index.ts:30 ~ currentWidth", currentWidth);
-  // console.log("🚀 ~ file: index.ts:32 ~ currentHeight", currentHeight);
-  console.log("event:", e);
-  // barTextFontSize = `${end - start - 33}`;
-  // console.log(barTextFontSize);
-});
+// * listen to data zoom
+// myChart.on("dataZoom", (e: any) => {
+//   // const start = e.start;
+//   // const end = e.end;
+//   console.log("event:", e);
+// });
 
 const timeData = [
   [0, "2017-04-1", "2020-06-07", 100, "Ali"],
@@ -99,7 +98,7 @@ const renderGanttItem = (
   const y = start[1] - height;
 
   const imagePosition = x + width + 20;
-  const textBarPosition = y + height / 2;
+  const textPosition = y + height / 2 - 5;
 
   const rectShape = echarts.graphic.clipRectByRect(
     {
@@ -167,7 +166,7 @@ const renderGanttItem = (
           text: `Milestone 0${index + 1}`,
           fill: "#fff",
           x: x + 20,
-          y: textBarPosition - 5,
+          y: textPosition,
           width,
           // height,
           fontSize: 14,
@@ -189,7 +188,7 @@ const renderGanttItem = (
         style: {
           text: String(employeeName),
           x: imagePosition + height + 10,
-          y: textBarPosition - 5,
+          y: textPosition,
           fontSize: 14,
         },
       },
@@ -198,9 +197,10 @@ const renderGanttItem = (
 };
 
 const xAxisLabelFormatter = (value: any) => {
+  const year = moment(value).format("YYYY");
   const q = moment(value).format("Q");
 
-  return +q === 1 ? "{yyyy}" : "";
+  return +q === 1 ? year : "";
 };
 
 const option: EChartsOption = {
@@ -217,7 +217,7 @@ const option: EChartsOption = {
 
       return `<b>Milestone</b>: ${data[0] + 1}<br /><b>From period</b>: ${
         data[1]
-      } to ${data[2]}<br /><b>Done percentage</b>: ${
+      } <b>to</b> ${data[2]}<br /><b>Done percentage</b>: ${
         data[3]
       }<br /><b>For employee</b>: ${data[4]}`;
     },
@@ -234,6 +234,7 @@ const option: EChartsOption = {
       right: 10,
       top: 100,
       bottom: 80,
+      handleSize: "300%",
       start: yAxisScrollStart,
       end: yAxisScrollEnd,
       showDetail: false,
@@ -255,6 +256,7 @@ const option: EChartsOption = {
       xAxisIndex: [0, 1],
       height: 10,
       bottom: 40,
+      handleSize: "300%",
       start: xAxisScrollStart,
       end: xAxisScrollEnd,
       showDetail: false,
@@ -271,13 +273,11 @@ const option: EChartsOption = {
       },
       offset: 25,
       axisLabel: {
-        // align: "center",
         color: "#fff",
         fontWeight: "bold",
         backgroundColor: "blue",
         borderRadius: 5,
         height: 10,
-        width: 25,
         padding: 10,
         showMinLabel: true,
         showMaxLabel: true,
@@ -337,3 +337,41 @@ const option: EChartsOption = {
 };
 
 myChart.setOption(option);
+
+// listen to buttons events
+window.addEventListener("click", (e: MouseEvent) => {
+  if (e.target === yearBtn) {
+    const xAxis: any = option.xAxis;
+
+    xAxis[0].axisLabel.formatter = xAxisLabelFormatter;
+    xAxis[1].show = true;
+
+    myChart.setOption({ ...option, xAxis });
+  }
+
+  if (e.target === monthBtn) {
+    const xAxis: any = option.xAxis;
+
+    xAxis[0].axisLabel.formatter = (val: any) => {
+      const month = moment(val).format("MMM-YY");
+      return month;
+    };
+
+    xAxis[1].show = false;
+
+    myChart.setOption({ ...option, xAxis });
+  }
+
+  if (e.target === weekBtn) {
+    const xAxis: any = option.xAxis;
+
+    xAxis[0].axisLabel.formatter = (val: any) => {
+      const week = moment(val).format("WW");
+      return week;
+    };
+
+    xAxis[1].show = false;
+
+    myChart.setOption({ ...option, xAxis });
+  }
+});
