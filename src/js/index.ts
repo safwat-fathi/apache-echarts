@@ -30,9 +30,9 @@ const MAX = "2022";
 let xAxisScrollStart = 0;
 let xAxisScrollEnd = 50;
 let yAxisScrollStart = 0;
-let yAxisScrollEnd = 100;
+let yAxisScrollEnd = 12;
 
-let barTextPositionVar = 7;
+let barTextPositionVar = 2.2;
 // let barTextFontSize = `${yAxisScrollEnd - yAxisScrollStart - 33}`;
 
 myChart.on("dataZoom", (e: any) => {
@@ -97,7 +97,9 @@ const renderGanttItem = (
   const height = api.size([0, 1])[1] * HEIGHT_RATIO;
   const x = start[0];
   const y = start[1] - height;
+
   const imagePosition = x + width + 20;
+  const textBarPosition = y + height / 2;
 
   const rectShape = echarts.graphic.clipRectByRect(
     {
@@ -165,9 +167,9 @@ const renderGanttItem = (
           text: `Milestone 0${index + 1}`,
           fill: "#fff",
           x: x + 20,
-          y: y + height / barTextPositionVar,
+          y: textBarPosition - 5,
           width,
-          height,
+          // height,
           fontSize: 14,
         },
       },
@@ -187,7 +189,7 @@ const renderGanttItem = (
         style: {
           text: String(employeeName),
           x: imagePosition + height + 10,
-          y: y + height / barTextPositionVar,
+          y: textBarPosition - 5,
           fontSize: 14,
         },
       },
