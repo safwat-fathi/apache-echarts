@@ -27,22 +27,29 @@ const myChart = echarts.init(chartDom);
 
 // globals
 const HEIGHT_RATIO = 0.5;
+const FONT_SIZE = 50;
 const MIN = "2010";
 const MAX = "2022";
 
-let showQuarters = true;
-let xAxisType: "year" | "month" | "week" = "year";
-let xAxisScrollStart = 0;
-let xAxisScrollEnd = 50;
-let yAxisScrollStart = 0;
-let yAxisScrollEnd = 12;
+let xAxisZoomStart = 0;
+let xAxisZoomEnd = 50;
+let yAxisZoomStart = 0;
+let yAxisZoomEnd = 12;
 
 // * listen to data zoom
-// myChart.on("dataZoom", (e: any) => {
-//   // const start = e.start;
-//   // const end = e.end;
-//   console.log("event:", e);
-// });
+myChart.on("dataZoom", (e: any) => {
+  if (e.dataZoomId === "scrollY") {
+    yAxisZoomStart = e.start;
+    yAxisZoomEnd = e.end;
+  }
+
+  if (e.dataZoomId === "scrollX") {
+    xAxisZoomStart = e.start;
+    xAxisZoomEnd = e.end;
+  }
+
+  console.log("y axis zoom:", yAxisZoomEnd - yAxisZoomStart);
+});
 
 const timeData = [
   [0, "2017-04-1", "2020-06-07", 100, "Ali"],
@@ -144,16 +151,16 @@ const renderGanttItem = (
       {
         type: "rect",
         ignore: !rectShape,
-        shape: rectShape,
+        shape: { ...rectShape, r: 6 },
         style: {
           fill: "#ccc",
-          stroke: "black",
+          stroke: "transparent",
         },
       },
       {
         type: "rect",
         ignore: !rectPercent,
-        shape: rectPercent,
+        shape: { ...rectPercent, r: 6 },
         style: {
           fill: "green",
           stroke: "transparent",
@@ -168,15 +175,16 @@ const renderGanttItem = (
           x: x + 20,
           y: textPosition,
           width,
-          // height,
-          fontSize: 14,
+          // fontSize: FONT_SIZE * 0.6,
+          fontSize: FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 50),
         },
       },
       {
         type: "image",
+        // clipPath: [1,1,1,],
         style: {
           image:
-            "https://cdn.xxl.thumbs.canstockphoto.com/avatar-flat-style-vector-icon-user-sign-icon-human-avatar-black-icon-vector-illustration-image_csp70665772.jpg",
+            "https://pbs.twimg.com/profile_images/1329949157486854150/2vhx3rm9_400x400.jpg",
           x: imagePosition,
           y,
           width: height * 0.9,
@@ -229,14 +237,15 @@ const option: EChartsOption = {
     // Y axis scroll with slider
     {
       type: "slider",
+      id: "scrollY",
       yAxisIndex: 0,
       width: 10,
       right: 10,
       top: 100,
       bottom: 80,
       handleSize: "300%",
-      start: yAxisScrollStart,
-      end: yAxisScrollEnd,
+      start: yAxisZoomStart,
+      end: yAxisZoomEnd,
       showDetail: false,
     },
     // Y axis scroll inside grid
@@ -244,8 +253,8 @@ const option: EChartsOption = {
       type: "inside",
       id: "insideY",
       yAxisIndex: 0,
-      start: yAxisScrollStart,
-      end: yAxisScrollEnd,
+      start: yAxisZoomStart,
+      end: yAxisZoomEnd,
       zoomOnMouseWheel: false,
       moveOnMouseMove: true,
       moveOnMouseWheel: true,
@@ -253,12 +262,13 @@ const option: EChartsOption = {
     // X axis scroll & zoom with slider
     {
       type: "slider",
+      id: "scrollX",
       xAxisIndex: [0, 1],
       height: 10,
       bottom: 40,
       handleSize: "300%",
-      start: xAxisScrollStart,
-      end: xAxisScrollEnd,
+      start: xAxisZoomStart,
+      end: xAxisZoomEnd,
       showDetail: false,
     },
   ],
