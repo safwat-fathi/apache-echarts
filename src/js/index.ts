@@ -350,18 +350,32 @@ myChart.setOption(option);
 
 // listen to buttons events
 window.addEventListener("click", (e: MouseEvent) => {
+  // if (e.target !== yearBtn || e.target !== monthBtn || e.target !== weekBtn)
+  //   return;
+
+  const xAxis: any = option.xAxis;
+  const dataZoom: any = option.dataZoom;
+  console.log(
+    "🚀 ~ file: index.ts:365 ~ window.addEventListener ~ dataZoom",
+    dataZoom
+  );
+  dataZoom[0].start = yAxisZoomStart;
+  dataZoom[0].end = yAxisZoomEnd;
+  dataZoom[1].start = yAxisZoomStart;
+  dataZoom[1].end = yAxisZoomEnd;
+  dataZoom[2].start = xAxisZoomStart;
+  dataZoom[2].end = xAxisZoomEnd;
+
   if (e.target === yearBtn) {
     const xAxis: any = option.xAxis;
 
     xAxis[0].axisLabel.formatter = xAxisLabelFormatter;
     xAxis[1].show = true;
 
-    myChart.setOption({ ...option, xAxis });
+    myChart.setOption({ ...option, xAxis, dataZoom });
   }
 
   if (e.target === monthBtn) {
-    const xAxis: any = option.xAxis;
-
     xAxis[0].axisLabel.formatter = (val: any) => {
       const month = moment(val).format("MMM-YY");
       return month;
@@ -369,7 +383,7 @@ window.addEventListener("click", (e: MouseEvent) => {
 
     xAxis[1].show = false;
 
-    myChart.setOption({ ...option, xAxis });
+    myChart.setOption({ ...option, xAxis, dataZoom });
   }
 
   if (e.target === weekBtn) {
@@ -382,6 +396,6 @@ window.addEventListener("click", (e: MouseEvent) => {
 
     xAxis[1].show = false;
 
-    myChart.setOption({ ...option, xAxis });
+    myChart.setOption({ ...option, xAxis, dataZoom });
   }
 });
