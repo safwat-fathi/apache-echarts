@@ -27,14 +27,15 @@ const myChart = echarts.init(chartDom);
 
 // globals
 const HEIGHT_RATIO = 0.5;
-const FONT_SIZE = 50;
+const FONT_SIZE = 30;
 const MIN = "2010";
 const MAX = "2022";
 
 let xAxisZoomStart = 0;
 let xAxisZoomEnd = 50;
 let yAxisZoomStart = 0;
-let yAxisZoomEnd = 12;
+let yAxisZoomEnd = 5;
+let textPositionConstant = 10;
 
 // * listen to data zoom
 myChart.on("dataZoom", (e: any) => {
@@ -105,7 +106,7 @@ const renderGanttItem = (
   const y = start[1] - height;
 
   const imagePosition = x + width + 20;
-  const textPosition = y + height / 2 - 5;
+  const textPosition = y + height / 2 - textPositionConstant;
 
   const rectShape = echarts.graphic.clipRectByRect(
     {
@@ -175,8 +176,12 @@ const renderGanttItem = (
           x: x + 20,
           y: textPosition,
           width,
-          // fontSize: FONT_SIZE * 0.6,
-          fontSize: FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 50),
+          fontSize:
+            yAxisZoomEnd < 80
+              ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
+              : FONT_SIZE -
+                FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100) +
+                12,
         },
       },
       {
@@ -197,7 +202,12 @@ const renderGanttItem = (
           text: String(employeeName),
           x: imagePosition + height + 10,
           y: textPosition,
-          fontSize: 14,
+          fontSize:
+            yAxisZoomEnd < 80
+              ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
+              : FONT_SIZE -
+                FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100) +
+                12,
         },
       },
     ],
@@ -350,15 +360,13 @@ myChart.setOption(option);
 
 // listen to buttons events
 window.addEventListener("click", (e: MouseEvent) => {
-  // if (e.target !== yearBtn || e.target !== monthBtn || e.target !== weekBtn)
-  //   return;
+  if (e.target !== yearBtn && e.target !== monthBtn && e.target !== weekBtn) {
+    return;
+  }
 
   const xAxis: any = option.xAxis;
   const dataZoom: any = option.dataZoom;
-  console.log(
-    "🚀 ~ file: index.ts:365 ~ window.addEventListener ~ dataZoom",
-    dataZoom
-  );
+
   dataZoom[0].start = yAxisZoomStart;
   dataZoom[0].end = yAxisZoomEnd;
   dataZoom[1].start = yAxisZoomStart;
