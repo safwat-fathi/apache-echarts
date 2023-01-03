@@ -4,9 +4,13 @@
 	TODO: 	rich axis label. (weather statistics ex.)
 	TODO: ✔	add bar label on start of the bar.
 	TODO: ✔ show current date as marker line.
-	TODO: 	switch to change grid from (monthly-yearly-weekly).
+	TODO: ✔	switch to change grid from (monthly-yearly-weekly).
 	TODO: ✔ scroll grid vertically.
 	TODO: ✔ scroll grid horizontally.
+	TODO:		center bars horizontally.
+	TODO:		center text on bars.
+	TODO:		clip path to images as circle.
+	TODO:		meet UI.
  */
 
 import * as echarts from "echarts";
@@ -34,8 +38,8 @@ const MAX = "2022";
 let xAxisZoomStart = 0;
 let xAxisZoomEnd = 50;
 let yAxisZoomStart = 0;
-let yAxisZoomEnd = 5;
-let textPositionConstant = 10;
+let yAxisZoomEnd = 50;
+let textPositionConstant = 6;
 
 // * listen to data zoom
 myChart.on("dataZoom", (e: any) => {
@@ -49,7 +53,8 @@ myChart.on("dataZoom", (e: any) => {
     xAxisZoomEnd = e.end;
   }
 
-  console.log("y axis zoom:", yAxisZoomEnd - yAxisZoomStart);
+  // console.log("yAxisZoomEnd:", yAxisZoomEnd, "yAxisZoomStart:", yAxisZoomStart);
+  console.log("yAxisZoomEnd - yAxisZoomStart:", yAxisZoomEnd - yAxisZoomStart);
 });
 
 const timeData = [
@@ -177,16 +182,13 @@ const renderGanttItem = (
           y: textPosition,
           width,
           fontSize:
-            yAxisZoomEnd < 80
+            yAxisZoomEnd - yAxisZoomStart <= 51
               ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
-              : FONT_SIZE -
-                FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100) +
-                12,
+              : 13,
         },
       },
       {
         type: "image",
-        // clipPath: [1,1,1,],
         style: {
           image:
             "https://pbs.twimg.com/profile_images/1329949157486854150/2vhx3rm9_400x400.jpg",
@@ -203,11 +205,9 @@ const renderGanttItem = (
           x: imagePosition + height + 10,
           y: textPosition,
           fontSize:
-            yAxisZoomEnd < 80
+            yAxisZoomEnd - yAxisZoomStart <= 51
               ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
-              : FONT_SIZE -
-                FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100) +
-                12,
+              : 13,
         },
       },
     ],
