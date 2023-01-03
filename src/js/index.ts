@@ -8,7 +8,7 @@
 	TODO: ✔ scroll grid vertically.
 	TODO: ✔ scroll grid horizontally.
 	TODO:		center bars horizontally.
-	TODO:		center text on bars.
+	TODO:	✔	center text on bars.
 	TODO:		clip path to images as circle.
 	TODO:		meet UI.
  */
@@ -38,7 +38,8 @@ const MAX = "2022";
 let xAxisZoomStart = 0;
 let xAxisZoomEnd = 50;
 let yAxisZoomStart = 0;
-let yAxisZoomEnd = 50;
+let yAxisZoomEnd = 70;
+// let textPositionConstant = 10;
 let textPositionConstant = 6;
 
 // * listen to data zoom
@@ -53,8 +54,20 @@ myChart.on("dataZoom", (e: any) => {
     xAxisZoomEnd = e.end;
   }
 
-  // console.log("yAxisZoomEnd:", yAxisZoomEnd, "yAxisZoomStart:", yAxisZoomStart);
-  console.log("yAxisZoomEnd - yAxisZoomStart:", yAxisZoomEnd - yAxisZoomStart);
+  if (yAxisZoomEnd - yAxisZoomStart <= 30) {
+    textPositionConstant = 9;
+  }
+
+  if (
+    yAxisZoomEnd - yAxisZoomStart > 30 ||
+    yAxisZoomEnd - yAxisZoomStart <= 50
+  ) {
+    textPositionConstant = 8;
+  }
+
+  if (yAxisZoomEnd - yAxisZoomStart > 60) {
+    textPositionConstant = 6;
+  }
 });
 
 const timeData = [
