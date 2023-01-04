@@ -9,6 +9,11 @@
         display: flex;
         flex-flow: column;
         width: 1000px;
+        position: relative;
+      }
+
+      #chart {
+        z-index: 100;
       }
 
       .btn-group {
@@ -40,11 +45,35 @@
         color: #fff;
         background: #005371;
       }
+
+      #xAxisPrimaryBg {
+        display: block;
+        width: calc(100% - 14%);
+        height: 30px;
+        background-color: #005371;
+        position: absolute;
+        top: 45px;
+        left: 7%;
+        z-index: 10;
+      }
+
+      #xAxisSecondaryBg {
+        display: block;
+        width: calc(100% - 14%);
+        height: 20px;
+        background-color: #eeedf0;
+        position: absolute;
+        top: 75px;
+        left: 7%;
+        z-index: 10;
+      }
     </style>
   </head>
   <body>
     <div class="wrapper">
       <div id="chart" style="width: 1000px; height: 600px"></div>
+      <div id="xAxisPrimaryBg"></div>
+      <div id="xAxisSecondaryBg"></div>
       <div class="btn-group">
         <button id="yearly" class="active">Yearly</button>
         <button id="monthly">Monthly</button>

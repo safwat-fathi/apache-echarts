@@ -57,8 +57,8 @@ const timeData = [
   [12, "2016-11-1", "2022-01-1", 0, "Mahmoud"],
 ];
 
-let xAxisZoomStart = 0;
-let xAxisZoomEnd = 50;
+let xAxisZoomStart = 50;
+let xAxisZoomEnd = 100;
 let yAxisZoomStart = 0;
 let yAxisZoomEnd = 70;
 // let textPositionConstant = 10;
@@ -101,10 +101,10 @@ const calculateQuarters = (min: number, max: number): string[] => {
   let i = 0;
   while (i <= quartersCount - 4) {
     if (i % 4 === 0) {
-      quarters[i] = "q1";
-      quarters[i + 1] = "q2";
-      quarters[i + 2] = "q3";
-      quarters[i + 3] = "q4";
+      quarters[i] = "Q1";
+      quarters[i + 1] = "Q2";
+      quarters[i + 2] = "Q3";
+      quarters[i + 3] = "Q4";
     }
 
     i++;
@@ -189,7 +189,7 @@ const renderGanttItem = (
         ignore: !rectShape,
         shape: { ...rectShape, r: 6 },
         style: {
-          fill: "#eee",
+          fill: "#eeedf0",
           stroke: "transparent",
         },
       },
@@ -338,15 +338,16 @@ const option: EChartsOption = {
       axisLine: {
         show: false,
       },
-      offset: 25,
+      offset: 20,
       axisLabel: {
         color: "#fff",
+        fontSize: 20,
         // fontWeight: "bold",
-        backgroundColor: "blue",
+        // backgroundColor: "#005371",
         // borderRadius: 5,
         // height: 10,
-        width: 200,
-        // padding: 10,
+        // width: 15,
+        // padding: [0, 100],
         showMinLabel: true,
         showMaxLabel: true,
         formatter: xAxisLabelFormatter,
@@ -354,15 +355,25 @@ const option: EChartsOption = {
     },
     {
       show: true,
+      axisLine: {
+        show: false,
+      },
+      axisTick: {
+        show: false,
+      },
       position: "top",
       data: calculateQuarters(+MIN, +MAX),
       splitLine: {
         show: true,
         interval: function (_, value) {
-          return value === "q1" ? true : false;
+          return value === "Q1" ? true : false;
         },
       },
       offset: 1,
+      axisLabel: {
+        fontSize: 13,
+        color: "#a7a7a7",
+      },
     },
   ],
   yAxis: {
