@@ -25,7 +25,7 @@ type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 const yearBtn = document.getElementById("yearly");
 const monthBtn = document.getElementById("monthly");
 const weekBtn = document.getElementById("weekly");
-const chartDom = <HTMLElement>document.getElementById("main");
+const chartDom = <HTMLElement>document.getElementById("chart");
 
 const myChart = echarts.init(chartDom);
 
@@ -34,6 +34,28 @@ const HEIGHT_RATIO = 0.5;
 const FONT_SIZE = 30;
 const MIN = "2010";
 const MAX = "2022";
+const COLORS = {
+  completed: "#98e464",
+  inProgress: "#47c0f4",
+  delayed: "#fba606",
+  notStarted: "#9193fc",
+};
+
+const timeData = [
+  [0, "2017-04-1", "2020-06-07", 100, "Ali"],
+  [1, "2011-02-1", "2013-09-19", 20, "Omar"],
+  [2, "2017-05-1", "2017-12-01", 50, "Mostafa"],
+  [3, "2011-11-1", "2019-05-1", 90, "Khaled"],
+  [4, "2019-11-1", "2022-01-1", 60, "Karam"],
+  [5, "2011-11-1", "2013-01-1", 80, "Safwat"],
+  [6, "2015-01-1", "2019-11-1", 80, "Anas"],
+  [7, "2013-01-1", "2014-11-1", 40, "Kareem"],
+  [8, "2010-11-1", "2013-01-1", 90, "Lamyaa"],
+  [9, "2010-02-1", "2013-01-1", 100, "Sara"],
+  [10, "2010-05-1", "2013-08-1", 60, "Ola"],
+  [11, "2010-12-1", "2013-12-1", 30, "Tarek"],
+  [12, "2016-11-1", "2022-01-1", 0, "Mahmoud"],
+];
 
 let xAxisZoomStart = 0;
 let xAxisZoomEnd = 50;
@@ -70,22 +92,6 @@ myChart.on("dataZoom", (e: any) => {
   }
 });
 
-const timeData = [
-  [0, "2017-04-1", "2020-06-07", 100, "Ali"],
-  [1, "2011-02-1", "2013-09-19", 20, "Omar"],
-  [2, "2017-05-1", "2017-12-01", 50, "Mostafa"],
-  [3, "2011-11-1", "2019-05-1", 90, "Khaled"],
-  [4, "2019-11-1", "2022-01-1", 60, "Karam"],
-  [5, "2011-11-1", "2013-01-1", 80, "Safwat"],
-  [6, "2015-01-1", "2019-11-1", 80, "Anas"],
-  [7, "2013-01-1", "2014-11-1", 40, "Kareem"],
-  [8, "2010-11-1", "2013-01-1", 90, "Lamyaa"],
-  [9, "2010-02-1", "2013-01-1", 100, "Sara"],
-  [10, "2010-05-1", "2013-08-1", 60, "Ola"],
-  [11, "2010-12-1", "2013-12-1", 30, "Tarek"],
-  [14, "2016-11-1", "2022-02-1", 0, "Mahmoud"],
-];
-
 const calculateQuarters = (min: number, max: number): string[] => {
   let quarters;
 
@@ -107,6 +113,16 @@ const calculateQuarters = (min: number, max: number): string[] => {
   return quarters;
 };
 
+const fillColor = (percent: number) => {
+  return percent === 0
+    ? COLORS.notStarted
+    : percent < 30
+    ? COLORS.delayed
+    : percent === 100
+    ? COLORS.completed
+    : COLORS.inProgress;
+};
+
 const renderGanttItem = (
   params: RenderItemParams,
   api: RenderItemAPI
@@ -116,6 +132,7 @@ const renderGanttItem = (
   const end = api.coord([api.value(2), index]);
   const percentage = api.value(3);
   const employeeName = api.value(4);
+  const color = api.value(5);
   const width = end[0] - start[0];
 
   // @ts-ignore
@@ -172,7 +189,7 @@ const renderGanttItem = (
         ignore: !rectShape,
         shape: { ...rectShape, r: 6 },
         style: {
-          fill: "#ccc",
+          fill: "#eee",
           stroke: "transparent",
         },
       },
@@ -181,7 +198,7 @@ const renderGanttItem = (
         ignore: !rectPercent,
         shape: { ...rectPercent, r: 6 },
         style: {
-          fill: "green",
+          fill: String(fillColor(+percentage)),
           stroke: "transparent",
         },
       },
@@ -189,11 +206,28 @@ const renderGanttItem = (
         type: "text",
         style: {
           // @ts-ignore
-          text: `Milestone 0${index + 1}`,
-          fill: "#fff",
+          text: width <= 160 ? "Mile..." : `Milestone 0${index + 1}`,
+          fill: "#000",
           x: x + 20,
           y: textPosition,
           width,
+          fontWeight: "bold",
+          fontSize:
+            yAxisZoomEnd - yAxisZoomStart <= 51
+              ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
+              : 13,
+        },
+      },
+      {
+        type: "text",
+        style: {
+          // @ts-ignore
+          text: width > 100 ? `${percentage}%` : "",
+          fill: "#000",
+          x: percentage === 100 ? x + width - 60 : x + width - 50,
+          y: textPosition,
+          width,
+          fontWeight: "bold",
           fontSize:
             yAxisZoomEnd - yAxisZoomStart <= 51
               ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
@@ -250,7 +284,7 @@ const option: EChartsOption = {
         data[1]
       } <b>to</b> ${data[2]}<br /><b>Done percentage</b>: ${
         data[3]
-      }<br /><b>For employee</b>: ${data[4]}`;
+      }%<br /><b>For employee</b>: ${data[4]}`;
     },
   },
   grid: {
@@ -307,11 +341,12 @@ const option: EChartsOption = {
       offset: 25,
       axisLabel: {
         color: "#fff",
-        fontWeight: "bold",
+        // fontWeight: "bold",
         backgroundColor: "blue",
-        borderRadius: 5,
-        height: 10,
-        padding: 10,
+        // borderRadius: 5,
+        // height: 10,
+        width: 200,
+        // padding: 10,
         showMinLabel: true,
         showMaxLabel: true,
         formatter: xAxisLabelFormatter,
@@ -362,7 +397,7 @@ const option: EChartsOption = {
         symbol: "rect",
         symbolRotate: 90,
         lineStyle: {
-          color: "blue",
+          color: "#005371",
         },
       },
     },
@@ -377,6 +412,8 @@ window.addEventListener("click", (e: MouseEvent) => {
     return;
   }
 
+  document.querySelector(".active")?.classList.remove("active");
+
   const xAxis: any = option.xAxis;
   const dataZoom: any = option.dataZoom;
 
@@ -388,6 +425,7 @@ window.addEventListener("click", (e: MouseEvent) => {
   dataZoom[2].end = xAxisZoomEnd;
 
   if (e.target === yearBtn) {
+    yearBtn?.classList.add("active");
     const xAxis: any = option.xAxis;
 
     xAxis[0].axisLabel.formatter = xAxisLabelFormatter;
@@ -397,6 +435,7 @@ window.addEventListener("click", (e: MouseEvent) => {
   }
 
   if (e.target === monthBtn) {
+    monthBtn?.classList.add("active");
     xAxis[0].axisLabel.formatter = (val: any) => {
       const month = moment(val).format("MMM-YY");
       return month;
@@ -408,6 +447,7 @@ window.addEventListener("click", (e: MouseEvent) => {
   }
 
   if (e.target === weekBtn) {
+    weekBtn?.classList.add("active");
     const xAxis: any = option.xAxis;
 
     xAxis[0].axisLabel.formatter = (val: any) => {

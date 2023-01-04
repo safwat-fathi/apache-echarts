@@ -4,13 +4,52 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>E-Charts</title>
+    <style>
+      .wrapper {
+        display: flex;
+        flex-flow: column;
+        width: 1000px;
+      }
+
+      .btn-group {
+        align-self: flex-end;
+      }
+
+      .btn-group button {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        cursor: pointer;
+        outline: none;
+        border: 2px solid #ccc;
+        transition: all 0.3s;
+      }
+      .btn-group button:active {
+        color: #fff;
+        outline: none;
+        background: #005371;
+        border: 2px solid transparent;
+      }
+      .btn-group button:hover {
+        color: #fff;
+        border: 2px solid transparent;
+        background: #005371;
+      }
+
+      button.active {
+        border: 2px solid transparent;
+        color: #fff;
+        background: #005371;
+      }
+    </style>
   </head>
   <body>
-    <div id="main" style="width: 1000px; height: 600px"></div>
-    <div>
-      <button id="yearly">Yearly</button>
-      <button id="monthly">Monthly</button>
-      <button id="weekly">Weekly</button>
+    <div class="wrapper">
+      <div id="chart" style="width: 1000px; height: 600px"></div>
+      <div class="btn-group">
+        <button id="yearly" class="active">Yearly</button>
+        <button id="monthly">Monthly</button>
+        <button id="weekly">Weekly</button>
+      </div>
     </div>
   </body>
 </html>
