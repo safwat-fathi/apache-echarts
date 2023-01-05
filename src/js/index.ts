@@ -51,14 +51,14 @@ const timeData = [
   [6, "2015-01-1", "2019-11-1", 80, "Anas"],
   [7, "2013-01-1", "2014-11-1", 40, "Kareem"],
   [8, "2010-11-1", "2013-01-1", 90, "Lamyaa"],
-  [9, "2010-02-1", "2013-01-1", 100, "Sara"],
+  [9, "2010-02-1", "2013-01-1", 100, "Amira"],
   [10, "2010-05-1", "2013-08-1", 60, "Ola"],
   [11, "2010-12-1", "2013-12-1", 30, "Tarek"],
   [12, "2016-11-1", "2022-01-1", 0, "Mahmoud"],
 ];
 
 let xAxisZoomStart = 0;
-let xAxisZoomEnd = 50;
+let xAxisZoomEnd = 20;
 let yAxisZoomStart = 0;
 let yAxisZoomEnd = 70;
 // let textPositionConstant = 10;
@@ -134,9 +134,19 @@ const renderGanttItem = (
   const employeeName = api.value(4);
   const width = end[0] - start[0];
 
-  console.log("api.size([1, 2]):", <number>(api.size && api.size([1, 2])));
-  console.log("api.size([2, 3]):", <number>(api.size && api.size([2, 3])));
-  console.log("api.size([3, 4]):", <number>(api.size && api.size([3, 4])));
+  console.log("api.size([0, 1]):", <number>(api.size && api.size([0, 1])));
+  console.log(
+    "api.size([1.5, index]):",
+    <number>(api.size && api.size([1.5, index]))
+  );
+  console.log(
+    "api.size([2, index]):",
+    <number>(api.size && api.size([2, index]))
+  );
+  console.log(
+    "api.size([3, index]):",
+    <number>(api.size && api.size([3, index]))
+  );
 
   // @ts-ignore
   const height = <number>(api.size([0, 1])[1] * HEIGHT_RATIO);
@@ -247,6 +257,7 @@ const renderGanttItem = (
           width: height * 0.9,
           height: height * 0.9,
         },
+        // clipPath: "",
       },
       {
         type: "text",
@@ -278,6 +289,10 @@ const option: EChartsOption = {
     axisPointer: {
       axis: "y",
       type: "shadow",
+      shadowStyle: {
+        color: "#2b64bb7c",
+        opacity: "0.3",
+      },
     },
     position: (point: number[]) => [point[0], point[1] + 20],
     formatter: function (params: any) {
@@ -367,7 +382,7 @@ const option: EChartsOption = {
       },
       offset: 0,
       axisLabel: {
-        fontSize: 13,
+        fontSize: 11,
         color: "#a7a7a7",
       },
     },
@@ -391,6 +406,7 @@ const option: EChartsOption = {
       },
       xAxisIndex: 0,
       renderItem: renderGanttItem,
+      clip: true,
     },
     // marker for current date
     {
