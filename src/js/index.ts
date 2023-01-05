@@ -1,13 +1,12 @@
 /*  
 	TODO: ✔ add custom image on every bar with text.
 	TODO: ✔ hover over grid highlights bar on graph.
-	TODO: 	rich axis label. (weather statistics ex.)
 	TODO: ✔	add bar label on start of the bar.
 	TODO: ✔ show current date as marker line.
 	TODO: ✔	switch to change grid from (monthly-yearly-weekly).
 	TODO: ✔ scroll grid vertically.
 	TODO: ✔ scroll grid horizontally.
-	TODO:		center bars horizontally.
+	TODO:	✔	center bars horizontally.
 	TODO:	✔	center text on bars.
 	TODO:		clip path to images as circle.
 	TODO:		meet UI.
@@ -26,6 +25,7 @@ const yearBtn = document.getElementById("yearly");
 const monthBtn = document.getElementById("monthly");
 const weekBtn = document.getElementById("weekly");
 const chartDom = <HTMLElement>document.getElementById("chart");
+const quartersBG = <HTMLElement>document.getElementById("xAxisSecondaryBg");
 
 const myChart = echarts.init(chartDom);
 
@@ -57,8 +57,8 @@ const timeData = [
   [12, "2016-11-1", "2022-01-1", 0, "Mahmoud"],
 ];
 
-let xAxisZoomStart = 50;
-let xAxisZoomEnd = 100;
+let xAxisZoomStart = 0;
+let xAxisZoomEnd = 50;
 let yAxisZoomStart = 0;
 let yAxisZoomEnd = 70;
 // let textPositionConstant = 10;
@@ -128,17 +128,20 @@ const renderGanttItem = (
   api: RenderItemAPI
 ): RenderItemReturn => {
   const index = api.value(0);
-  const start = api.coord([api.value(1), index]);
-  const end = api.coord([api.value(2), index]);
+  const start = api.coord([api.value(1), index]); // api.coord([x, y])
+  const end = api.coord([api.value(2), index]); // api.coord([x, y])
   const percentage = api.value(3);
   const employeeName = api.value(4);
-  const color = api.value(5);
   const width = end[0] - start[0];
 
+  console.log("api.size([1, 2]):", <number>(api.size && api.size([1, 2])));
+  console.log("api.size([2, 3]):", <number>(api.size && api.size([2, 3])));
+  console.log("api.size([3, 4]):", <number>(api.size && api.size([3, 4])));
+
   // @ts-ignore
-  const height = api.size([0, 1])[1] * HEIGHT_RATIO;
+  const height = <number>(api.size([0, 1])[1] * HEIGHT_RATIO);
   const x = start[0];
-  const y = start[1] - height;
+  const y = start[1] - height / 2;
 
   const imagePosition = x + width + 20;
   const textPosition = y + height / 2 - textPositionConstant;
@@ -338,16 +341,11 @@ const option: EChartsOption = {
       axisLine: {
         show: false,
       },
-      offset: 20,
+      axisTick: { show: false },
+      offset: 40,
       axisLabel: {
         color: "#fff",
-        fontSize: 20,
-        // fontWeight: "bold",
-        // backgroundColor: "#005371",
-        // borderRadius: 5,
-        // height: 10,
-        // width: 15,
-        // padding: [0, 100],
+        fontSize: 18,
         showMinLabel: true,
         showMaxLabel: true,
         formatter: xAxisLabelFormatter,
@@ -355,9 +353,7 @@ const option: EChartsOption = {
     },
     {
       show: true,
-      axisLine: {
-        show: false,
-      },
+      axisLine: { show: false },
       axisTick: {
         show: false,
       },
@@ -365,11 +361,11 @@ const option: EChartsOption = {
       data: calculateQuarters(+MIN, +MAX),
       splitLine: {
         show: true,
-        interval: function (_, value) {
+        interval: function (_, value: string) {
           return value === "Q1" ? true : false;
         },
       },
-      offset: 1,
+      offset: 0,
       axisLabel: {
         fontSize: 13,
         color: "#a7a7a7",
@@ -436,7 +432,9 @@ window.addEventListener("click", (e: MouseEvent) => {
   dataZoom[2].end = xAxisZoomEnd;
 
   if (e.target === yearBtn) {
+    quartersBG.style.display = "block";
     yearBtn?.classList.add("active");
+
     const xAxis: any = option.xAxis;
 
     xAxis[0].axisLabel.formatter = xAxisLabelFormatter;
@@ -446,7 +444,9 @@ window.addEventListener("click", (e: MouseEvent) => {
   }
 
   if (e.target === monthBtn) {
+    quartersBG.style.display = "none";
     monthBtn?.classList.add("active");
+
     xAxis[0].axisLabel.formatter = (val: any) => {
       const month = moment(val).format("MMM-YY");
       return month;
@@ -458,7 +458,9 @@ window.addEventListener("click", (e: MouseEvent) => {
   }
 
   if (e.target === weekBtn) {
+    quartersBG.style.display = "none";
     weekBtn?.classList.add("active");
+
     const xAxis: any = option.xAxis;
 
     xAxis[0].axisLabel.formatter = (val: any) => {
