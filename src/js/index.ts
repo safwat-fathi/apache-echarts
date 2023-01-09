@@ -29,7 +29,14 @@ const quarterBtn = document.getElementById("quarterly");
 const monthBtn = document.getElementById("monthly");
 const chartDom = <HTMLElement>document.getElementById("chart");
 
-const myChart = echarts.init(chartDom);
+const chart = echarts.init(chartDom);
+
+// observe resize of window
+new ResizeObserver(() => {
+  if (chart) {
+    chart.resize();
+  }
+}).observe(chartDom);
 
 // globals
 const HEIGHT_RATIO = 0.5;
@@ -59,50 +66,19 @@ const timeData = [
   [12, "2016-11-1", "2022-01-1", 0, "Mahmoud"],
 ];
 
-let xAxisZoomStart = 0;
-let xAxisZoomEnd = 30;
-let yAxisZoomStart = 25;
-let yAxisZoomEnd = 75;
+let xAxisZoomStart = 60;
+let xAxisZoomEnd = 100;
+let yAxisZoomStart = 0;
+let yAxisZoomEnd = 100;
 // let textPositionConstant = 10;
 let textPositionConstant = 6;
 
 // * listen to data zoom
-// myChart.on("dataZoom", function (e: any) {
+// chart.on("dataZoom", function (e: any) {
 //   console.log("event", e);
 //   return false;
 // });
-myChart.on("dataZoom", (e: any) => {
-  // myChart.dispatchAction({
-  //   type: "dataZoom",
-  //   dataZoomIndex: 0,
-
-  //   // set as percents
-  //   start: "20%",
-  //   end: "80%",
-  // });
-  // if (
-  //   (e.dataZoomId === "scrollY" && e.end - e.start <= 20) ||
-  //   (e.dataZoomId === "scrollX" && e.end - e.start <= 13)
-  // ) {
-  //   console.log("no more zoom allowed!");
-  //   console.log("event", e);
-  //   // const dataZoom: any = option.dataZoom;
-
-  //   // // dataZoom[0].start = yAxisZoomStart;
-  //   if (e.dataZoomId === "scrollY") {
-  //     e.start = e.start;
-  //     e.end = 20;
-  //   }
-
-  //   if (e.dataZoomId === "scrollX") {
-  //     e.start = e.start;
-  //     e.end = e.end;
-  //   }
-  //   // // dataZoom[2].end = xAxisZoomEnd;
-  //   // myChart.setOption({ dataZoom });
-  //   return;
-  // }
-
+chart.on("dataZoom", (e: any) => {
   if (e.dataZoomId === "scrollY") {
     yAxisZoomStart = e.start;
     yAxisZoomEnd = e.end;
@@ -129,26 +105,26 @@ myChart.on("dataZoom", (e: any) => {
   }
 });
 
-const calculateQuarters = (min: number, max: number): string[] => {
-  let quarters;
+// const calculateQuarters = (min: number, max: number): string[] => {
+//   let quarters;
 
-  const quartersCount = (max - min) * 4;
-  quarters = new Array(quartersCount);
+//   const quartersCount = (max - min) * 4;
+//   quarters = new Array(quartersCount);
 
-  let i = 0;
-  while (i <= quartersCount - 4) {
-    if (i % 4 === 0) {
-      quarters[i] = "Q1";
-      quarters[i + 1] = "Q2";
-      quarters[i + 2] = "Q3";
-      quarters[i + 3] = "Q4";
-    }
+//   let i = 0;
+//   while (i <= quartersCount - 4) {
+//     if (i % 4 === 0) {
+//       quarters[i] = "Q1";
+//       quarters[i + 1] = "Q2";
+//       quarters[i + 2] = "Q3";
+//       quarters[i + 3] = "Q4";
+//     }
 
-    i++;
-  }
+//     i++;
+//   }
 
-  return quarters;
-};
+//   return quarters;
+// };
 
 const fillColor = (percent: number) => {
   return percent === 0
@@ -341,6 +317,7 @@ const option: EChartsOption = {
   },
   grid: {
     top: 100,
+    right: 40,
   },
   dataZoom: [
     // Y axis scroll with slider
@@ -351,20 +328,22 @@ const option: EChartsOption = {
       width: 10,
       right: 10,
       top: 100,
-      bottom: 80,
+      bottom: 20,
       handleSize: "300%",
       start: yAxisZoomStart,
       end: yAxisZoomEnd,
       showDetail: false,
-      filterMode: "none",
       minSpan: 35,
       maxSpan: 80,
+      filterMode: "none",
     },
     // Y axis scroll inside grid
     {
       type: "inside",
       id: "insideY",
       yAxisIndex: 0,
+      top: 100,
+      // bottom: 0,
       start: yAxisZoomStart,
       end: yAxisZoomEnd,
       zoomOnMouseWheel: false,
@@ -378,13 +357,13 @@ const option: EChartsOption = {
       id: "scrollX",
       xAxisIndex: [0, 1],
       height: 10,
-      bottom: 40,
+      bottom: 20,
       handleSize: "300%",
-      minSpan: 12.5,
-      maxSpan: 60,
       start: xAxisZoomStart,
       end: xAxisZoomEnd,
       showDetail: false,
+      minSpan: 12.5,
+      maxSpan: 60,
       filterMode: "none",
     },
   ],
@@ -404,7 +383,6 @@ const option: EChartsOption = {
         fontSize: 18,
         showMinLabel: true,
         showMaxLabel: true,
-        // formatter: mainXAxisLabelFormatter,
         formatter: (value: any) => {
           const year = moment(value).format("YYYY");
           const q = moment(value).format("Q");
@@ -423,7 +401,6 @@ const option: EChartsOption = {
         show: false,
       },
       position: "top",
-      // data: calculateQuarters(+MIN, +MAX),
       splitLine: {
         show: true,
         interval: function (_, value: string) {
@@ -435,10 +412,6 @@ const option: EChartsOption = {
         fontSize: 11,
         color: "#a7a7a7",
         formatter: (value: any) => subXAxisLabelFormatter("Q", value),
-        // formatter: (value: any) => {
-        //   const quarter = moment(value).format("Q");
-        //   return `Q${quarter}`;
-        // },
       },
       splitNumber: 4,
     },
@@ -481,7 +454,7 @@ const option: EChartsOption = {
   ],
 };
 
-myChart.setOption(option);
+chart.setOption(option);
 
 // listen to buttons events
 window.addEventListener("click", (e: MouseEvent) => {
@@ -518,7 +491,7 @@ window.addEventListener("click", (e: MouseEvent) => {
   //     return week;
   //   };
 
-  //   myChart.setOption({ ...option, xAxis, dataZoom });
+  //   chart.setOption({ ...option, xAxis, dataZoom });
   // }
 
   if (e.target === quarterBtn) {
@@ -527,7 +500,7 @@ window.addEventListener("click", (e: MouseEvent) => {
     xAxis[1].axisLabel.formatter = (value: any) =>
       subXAxisLabelFormatter("Q", value);
 
-    myChart.setOption({ ...option, xAxis, dataZoom });
+    chart.setOption({ ...option, xAxis, dataZoom });
   }
 
   if (e.target === monthBtn) {
@@ -536,6 +509,6 @@ window.addEventListener("click", (e: MouseEvent) => {
     xAxis[1].axisLabel.formatter = (value: any) =>
       subXAxisLabelFormatter("MMM", value);
 
-    myChart.setOption({ ...option, xAxis, dataZoom });
+    chart.setOption({ ...option, xAxis, dataZoom });
   }
 });
