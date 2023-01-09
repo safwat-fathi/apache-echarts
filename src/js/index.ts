@@ -11,7 +11,7 @@
 	TODO:	Centering titles inside the bars
 	TODO:	spacing between bar + avatars
 	TODO:	periods/bars
-	TODO:	provide min/max zoom level
+	TODO:	✔ provide min/max zoom level
 	TODO:	remove the year button ( semesterly/quarterly/monthly)
  */
 
@@ -61,8 +61,8 @@ const timeData = [
 
 let xAxisZoomStart = 0;
 let xAxisZoomEnd = 30;
-let yAxisZoomStart = 0;
-let yAxisZoomEnd = 100;
+let yAxisZoomStart = 25;
+let yAxisZoomEnd = 75;
 // let textPositionConstant = 10;
 let textPositionConstant = 6;
 
@@ -72,6 +72,14 @@ let textPositionConstant = 6;
 //   return false;
 // });
 myChart.on("dataZoom", (e: any) => {
+  // myChart.dispatchAction({
+  //   type: "dataZoom",
+  //   dataZoomIndex: 0,
+
+  //   // set as percents
+  //   start: "20%",
+  //   end: "80%",
+  // });
   // if (
   //   (e.dataZoomId === "scrollY" && e.end - e.start <= 20) ||
   //   (e.dataZoomId === "scrollX" && e.end - e.start <= 13)
@@ -346,9 +354,11 @@ const option: EChartsOption = {
       bottom: 80,
       handleSize: "300%",
       start: yAxisZoomStart,
-      end: yAxisZoomEnd - yAxisZoomStart > 20 ? yAxisZoomEnd : 20,
+      end: yAxisZoomEnd,
       showDetail: false,
       filterMode: "none",
+      minSpan: 35,
+      maxSpan: 80,
     },
     // Y axis scroll inside grid
     {
@@ -370,6 +380,8 @@ const option: EChartsOption = {
       height: 10,
       bottom: 40,
       handleSize: "300%",
+      minSpan: 12.5,
+      maxSpan: 60,
       start: xAxisZoomStart,
       end: xAxisZoomEnd,
       showDetail: false,
