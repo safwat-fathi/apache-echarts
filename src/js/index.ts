@@ -1,15 +1,18 @@
-/*  
-	TODO: ✔ add custom image on every bar with text.
-	TODO: ✔ hover over grid highlights bar on graph.
-	TODO: ✔	add bar label on start of the bar.
-	TODO: ✔ show current date as marker line.
-	TODO: ✔	switch to change grid from (monthly-yearly-weekly).
-	TODO: ✔ scroll grid vertically.
-	TODO: ✔ scroll grid horizontally.
-	TODO:	✔	center bars horizontally.
-	TODO:	✔	center text on bars.
-	TODO:		clip path to images as circle.
-	TODO:		meet UI.
+/*
+	TODO:	✔ maintain the year header
+	TODO:	✔ avoid clipping the off canvas
+	TODO:	avoid squeezing bars horizontally
+	TODO:	meet UI
+		- clip path to images as circle
+		- custom legends
+
+	TODO:	Data Zoom Margins
+	TODO:	Trimming overlapping text
+	TODO:	Centering titles inside the bars
+	TODO:	spacing between bar + avatars
+	TODO:	periods/bars
+	TODO:	provide min/max zoom level
+	TODO:	remove the year button ( semesterly/quarterly/monthly)
  */
 
 import * as echarts from "echarts";
@@ -21,11 +24,10 @@ type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
 type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 
 // grab btn elements
-const yearBtn = document.getElementById("yearly");
+const semesterBtn = document.getElementById("semesterly");
+const quarterBtn = document.getElementById("quarterly");
 const monthBtn = document.getElementById("monthly");
-const weekBtn = document.getElementById("weekly");
 const chartDom = <HTMLElement>document.getElementById("chart");
-const quartersBG = <HTMLElement>document.getElementById("xAxisSecondaryBg");
 
 const myChart = echarts.init(chartDom);
 
@@ -58,14 +60,41 @@ const timeData = [
 ];
 
 let xAxisZoomStart = 0;
-let xAxisZoomEnd = 20;
+let xAxisZoomEnd = 30;
 let yAxisZoomStart = 0;
-let yAxisZoomEnd = 70;
+let yAxisZoomEnd = 100;
 // let textPositionConstant = 10;
 let textPositionConstant = 6;
 
 // * listen to data zoom
+// myChart.on("dataZoom", function (e: any) {
+//   console.log("event", e);
+//   return false;
+// });
 myChart.on("dataZoom", (e: any) => {
+  // if (
+  //   (e.dataZoomId === "scrollY" && e.end - e.start <= 20) ||
+  //   (e.dataZoomId === "scrollX" && e.end - e.start <= 13)
+  // ) {
+  //   console.log("no more zoom allowed!");
+  //   console.log("event", e);
+  //   // const dataZoom: any = option.dataZoom;
+
+  //   // // dataZoom[0].start = yAxisZoomStart;
+  //   if (e.dataZoomId === "scrollY") {
+  //     e.start = e.start;
+  //     e.end = 20;
+  //   }
+
+  //   if (e.dataZoomId === "scrollX") {
+  //     e.start = e.start;
+  //     e.end = e.end;
+  //   }
+  //   // // dataZoom[2].end = xAxisZoomEnd;
+  //   // myChart.setOption({ dataZoom });
+  //   return;
+  // }
+
   if (e.dataZoomId === "scrollY") {
     yAxisZoomStart = e.start;
     yAxisZoomEnd = e.end;
@@ -134,19 +163,19 @@ const renderGanttItem = (
   const employeeName = api.value(4);
   const width = end[0] - start[0];
 
-  console.log("api.size([0, 1]):", <number>(api.size && api.size([0, 1])));
-  console.log(
-    "api.size([1.5, index]):",
-    <number>(api.size && api.size([1.5, index]))
-  );
-  console.log(
-    "api.size([2, index]):",
-    <number>(api.size && api.size([2, index]))
-  );
-  console.log(
-    "api.size([3, index]):",
-    <number>(api.size && api.size([3, index]))
-  );
+  // console.log("api.size([0, 1]):", <number>(api.size && api.size([0, 1])));
+  // console.log(
+  //   "api.size([1.5, index]):",
+  //   <number>(api.size && api.size([1.5, index]))
+  // );
+  // console.log(
+  //   "api.size([2, index]):",
+  //   <number>(api.size && api.size([2, index]))
+  // );
+  // console.log(
+  //   "api.size([3, index]):",
+  //   <number>(api.size && api.size([3, index]))
+  // );
 
   // @ts-ignore
   const height = <number>(api.size([0, 1])[1] * HEIGHT_RATIO);
@@ -257,7 +286,6 @@ const renderGanttItem = (
           width: height * 0.9,
           height: height * 0.9,
         },
-        // clipPath: "",
       },
       {
         type: "text",
@@ -275,11 +303,9 @@ const renderGanttItem = (
   };
 };
 
-const xAxisLabelFormatter = (value: any) => {
-  const year = moment(value).format("YYYY");
-  const q = moment(value).format("Q");
-
-  return +q === 1 ? year : "";
+const subXAxisLabelFormatter = (type: "Q" | "MMM", value?: any) => {
+  const format = moment(value).format(type);
+  return type === "Q" ? `Q${format}` : format;
 };
 
 const option: EChartsOption = {
@@ -320,8 +346,9 @@ const option: EChartsOption = {
       bottom: 80,
       handleSize: "300%",
       start: yAxisZoomStart,
-      end: yAxisZoomEnd,
+      end: yAxisZoomEnd - yAxisZoomStart > 20 ? yAxisZoomEnd : 20,
       showDetail: false,
+      filterMode: "none",
     },
     // Y axis scroll inside grid
     {
@@ -333,6 +360,7 @@ const option: EChartsOption = {
       zoomOnMouseWheel: false,
       moveOnMouseMove: true,
       moveOnMouseWheel: true,
+      filterMode: "none",
     },
     // X axis scroll & zoom with slider
     {
@@ -345,6 +373,7 @@ const option: EChartsOption = {
       start: xAxisZoomStart,
       end: xAxisZoomEnd,
       showDetail: false,
+      filterMode: "none",
     },
   ],
   xAxis: [
@@ -363,17 +392,26 @@ const option: EChartsOption = {
         fontSize: 18,
         showMinLabel: true,
         showMaxLabel: true,
-        formatter: xAxisLabelFormatter,
+        // formatter: mainXAxisLabelFormatter,
+        formatter: (value: any) => {
+          const year = moment(value).format("YYYY");
+          const q = moment(value).format("Q");
+
+          return +q === 1 ? year : "";
+        },
       },
     },
     {
+      type: "time",
       show: true,
+      min: MIN,
+      max: MAX,
       axisLine: { show: false },
       axisTick: {
         show: false,
       },
       position: "top",
-      data: calculateQuarters(+MIN, +MAX),
+      // data: calculateQuarters(+MIN, +MAX),
       splitLine: {
         show: true,
         interval: function (_, value: string) {
@@ -384,7 +422,13 @@ const option: EChartsOption = {
       axisLabel: {
         fontSize: 11,
         color: "#a7a7a7",
+        formatter: (value: any) => subXAxisLabelFormatter("Q", value),
+        // formatter: (value: any) => {
+        //   const quarter = moment(value).format("Q");
+        //   return `Q${quarter}`;
+        // },
       },
+      splitNumber: 4,
     },
   ],
   yAxis: {
@@ -392,8 +436,6 @@ const option: EChartsOption = {
     splitLine: { show: false },
     axisLine: { show: false },
     axisLabel: { show: false },
-    min: 0,
-    max: timeData.length,
   },
   series: [
     {
@@ -431,15 +473,21 @@ myChart.setOption(option);
 
 // listen to buttons events
 window.addEventListener("click", (e: MouseEvent) => {
-  if (e.target !== yearBtn && e.target !== monthBtn && e.target !== weekBtn) {
+  if (
+    e.target !== semesterBtn &&
+    e.target !== monthBtn &&
+    e.target !== quarterBtn
+  ) {
     return;
   }
 
+  // toggle active class
   document.querySelector(".active")?.classList.remove("active");
 
   const xAxis: any = option.xAxis;
   const dataZoom: any = option.dataZoom;
 
+  // keep data zoom values across changes
   dataZoom[0].start = yAxisZoomStart;
   dataZoom[0].end = yAxisZoomEnd;
   dataZoom[1].start = yAxisZoomStart;
@@ -447,44 +495,34 @@ window.addEventListener("click", (e: MouseEvent) => {
   dataZoom[2].start = xAxisZoomStart;
   dataZoom[2].end = xAxisZoomEnd;
 
-  if (e.target === yearBtn) {
-    quartersBG.style.display = "block";
-    yearBtn?.classList.add("active");
+  // if (e.target === semesterBtn) {
+  //   quartersBG.style.display = "block";
+  //   semesterBtn?.classList.add("active");
 
-    const xAxis: any = option.xAxis;
+  //   const xAxis: any = option.xAxis;
 
-    xAxis[0].axisLabel.formatter = xAxisLabelFormatter;
-    xAxis[1].show = true;
+  // 	xAxis[1].axisLabel.formatter = (val: any) => {
+  //     const week = moment(val).format("WW");
+  //     return week;
+  //   };
+
+  //   myChart.setOption({ ...option, xAxis, dataZoom });
+  // }
+
+  if (e.target === quarterBtn) {
+    quarterBtn?.classList.add("active");
+
+    xAxis[1].axisLabel.formatter = (value: any) =>
+      subXAxisLabelFormatter("Q", value);
 
     myChart.setOption({ ...option, xAxis, dataZoom });
   }
 
   if (e.target === monthBtn) {
-    quartersBG.style.display = "none";
     monthBtn?.classList.add("active");
 
-    xAxis[0].axisLabel.formatter = (val: any) => {
-      const month = moment(val).format("MMM-YY");
-      return month;
-    };
-
-    xAxis[1].show = false;
-
-    myChart.setOption({ ...option, xAxis, dataZoom });
-  }
-
-  if (e.target === weekBtn) {
-    quartersBG.style.display = "none";
-    weekBtn?.classList.add("active");
-
-    const xAxis: any = option.xAxis;
-
-    xAxis[0].axisLabel.formatter = (val: any) => {
-      const week = moment(val).format("WW");
-      return week;
-    };
-
-    xAxis[1].show = false;
+    xAxis[1].axisLabel.formatter = (value: any) =>
+      subXAxisLabelFormatter("MMM", value);
 
     myChart.setOption({ ...option, xAxis, dataZoom });
   }
