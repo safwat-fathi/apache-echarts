@@ -6,13 +6,14 @@
 		- clip path to images as circle
 		- custom legends
 
-	TODO:	Data Zoom Margins
+	TODO:	handle highlight series on legend hover
+	TODO:	✔ Data Zoom Margins
 	TODO:	Trimming overlapping text
 	TODO:	Centering titles inside the bars
 	TODO:	spacing between bar + avatars
 	TODO:	periods/bars
 	TODO:	✔ provide min/max zoom level
-	TODO:	remove the year button ( semesterly/quarterly/monthly)
+	TODO:	✔ remove the year button ( semesterly/quarterly/monthly)
  */
 import "../styles.scss";
 import * as echarts from "echarts";
@@ -27,10 +28,10 @@ const chartDom = <HTMLElement>document.getElementById("chart");
 const semesterBtn = document.getElementById("semesterly");
 const quarterBtn = document.getElementById("quarterly");
 const monthBtn = document.getElementById("monthly");
-const inProgressLegend = document.getElementById("in-progress");
-const delayedLegend = document.getElementById("delayed");
-const completedLegend = document.getElementById("completed");
-const notStartedLegend = document.getElementById("not-started");
+// const inProgressLegend = document.getElementById("in-progress");
+// const delayedLegend = document.getElementById("delayed");
+// const completedLegend = document.getElementById("completed");
+// const notStartedLegend = document.getElementById("not-started");
 
 const chart = echarts.init(chartDom);
 
@@ -52,23 +53,32 @@ const COLORS = {
   notStarted: "#9193fc",
 };
 
-const timeData = [
-  [0, "2017-04-1", "2020-06-07", 100, "Ali"],
-  [1, "2011-02-1", "2013-09-19", 20, "Omar"],
-  [2, "2017-05-1", "2017-12-01", 50, "Mostafa"],
-  [3, "2011-11-1", "2019-05-1", 90, "Khaled"],
-  [4, "2019-11-1", "2022-01-1", 60, "Karam"],
-  [5, "2011-11-1", "2013-01-1", 80, "Safwat"],
-  [6, "2015-01-1", "2019-11-1", 80, "Anas"],
-  [7, "2013-01-1", "2014-11-1", 40, "Kareem"],
-  [8, "2010-11-1", "2013-01-1", 90, "Lamyaa"],
-  [9, "2010-02-1", "2013-01-1", 100, "Amira"],
-  [10, "2010-05-1", "2013-08-1", 60, "Ola"],
-  [11, "2010-12-1", "2013-12-1", 30, "Tarek"],
-  [12, "2016-10-23", "2018-04-17", 30, "Karam"],
-  [13, "2016-11-1", "2022-01-1", 0, "Mahmoud"],
-  [14, "2017-01-13", "2019-10-02", 60, "Amir"],
-];
+const data = {
+  inProgress: [
+    [3, "2011-11-1", "2019-05-1", 90, "Khaled"],
+    [4, "2019-11-1", "2022-01-1", 60, "Karam"],
+    [6, "2015-01-1", "2019-11-1", 80, "Anas"],
+    [8, "2010-11-1", "2013-01-1", 90, "Lamyaa"],
+    [10, "2010-05-1", "2013-08-1", 60, "Ola"],
+    [14, "2017-01-13", "2019-10-02", 60, "Amir"],
+  ],
+  complete: [
+    [0, "2017-04-1", "2020-06-07", 100, "Ali"],
+    [9, "2010-02-1", "2013-01-1", 100, "Amira"],
+  ],
+  notStarted: [
+    [14, "2017-01-13", "2019-10-02", 0, "Amir"],
+    [13, "2016-11-1", "2022-01-1", 0, "Mahmoud"],
+    [5, "2011-11-1", "2013-01-1", 0, "Safwat"],
+  ],
+  delayed: [
+    [7, "2013-01-1", "2014-11-1", 40, "Kareem"],
+    [2, "2017-05-1", "2017-12-01", 50, "Mostafa"],
+    [1, "2011-02-1", "2013-09-19", 20, "Omar"],
+    [11, "2010-12-1", "2013-12-1", 30, "Tarek"],
+    [12, "2016-10-23", "2018-04-17", 30, "Karam"],
+  ],
+};
 
 let xAxisZoomStart = 60;
 let xAxisZoomEnd = 100;
@@ -78,10 +88,10 @@ let yAxisZoomEnd = 100;
 let textPositionConstant = 6;
 
 // listen to data zoom event
-// chart.on("dataZoom", function (e: any) {
-// console.log("event: ", e);
-//   return false;
-// });
+chart.on("mouseover", function (e: any) {
+  console.log("event: ", e);
+  // return false;
+});
 chart.on("dataZoom", (e: any) => {
   if (e.dataZoomId === "scrollY") {
     yAxisZoomStart = e.start;
@@ -112,7 +122,7 @@ chart.on("dataZoom", (e: any) => {
 const fillColor = (percent: number) => {
   return percent === 0
     ? COLORS.notStarted
-    : percent < 30
+    : percent <= 50
     ? COLORS.delayed
     : percent === 100
     ? COLORS.completed
@@ -201,6 +211,7 @@ const renderGanttItem = (
           fill: "#eeedf0",
           stroke: "transparent",
         },
+        emphasis: {},
       },
       {
         type: "rect",
@@ -284,6 +295,9 @@ const subXAxisLabelFormatter = (
 };
 
 const option: EChartsOption = {
+  legend: {
+    show: true,
+  },
   // @ts-ignore
   tooltip: {
     trigger: "axis",
@@ -376,8 +390,6 @@ const option: EChartsOption = {
         showMinLabel: true,
         showMaxLabel: true,
         formatter: (value: any) => {
-          // const year = moment(value).format("YYYY");
-          // const q = moment(value).format("Q");
           const year = new Date(value).toLocaleDateString("en-US", {
             year: "numeric",
           });
@@ -422,11 +434,48 @@ const option: EChartsOption = {
   },
   series: [
     {
-      name: "employees-data",
+      name: "not-started",
       type: "custom",
-      data: timeData,
+
+      data: data.notStarted,
       encode: {
-        x: [0, 1, 2],
+        x: [1, 2],
+        y: 0, // reference of index
+      },
+      xAxisIndex: 0,
+      renderItem: renderGanttItem,
+      clip: true,
+    },
+    {
+      name: "complete",
+      type: "custom",
+      data: data.complete,
+      encode: {
+        x: [1, 2],
+        y: 0, // reference of index
+      },
+      xAxisIndex: 0,
+      renderItem: renderGanttItem,
+      clip: true,
+    },
+    {
+      name: "in-progress",
+      type: "custom",
+      data: data.inProgress,
+      encode: {
+        x: [1, 2],
+        y: 0, // reference of index
+      },
+      xAxisIndex: 0,
+      renderItem: renderGanttItem,
+      clip: true,
+    },
+    {
+      name: "delayed",
+      type: "custom",
+      data: data.delayed,
+      encode: {
+        x: [1, 2],
         y: 0, // reference of index
       },
       xAxisIndex: 0,
@@ -457,18 +506,6 @@ chart.setOption(option);
 // listen to buttons events
 window.addEventListener("click", (e: Event) => {
   const target = <Element>e.target;
-
-  // if (
-  //   target !== semesterBtn &&
-  //   target !== monthBtn &&
-  //   target !== quarterBtn &&
-  //   (target !== completedLegend) &&
-  //   (target !== notStartedLegend) &&
-  //   (target !== inProgressLegend) &&
-  //   (target !== delayedLegend)
-  // ) {
-  //   return;
-  // }
 
   // toggle active class
   if (target === semesterBtn || target === monthBtn || target === quarterBtn) {
@@ -527,18 +564,26 @@ window.addEventListener("click", (e: Event) => {
     const elementId = target.closest("div")?.getAttribute("id");
 
     if (elementId === "completed") {
+      chart.dispatchAction({ type: "legendToggleSelect", name: "complete" });
+      // highlight
+      chart.dispatchAction({ type: "highlight", seriesName: "complete" });
       console.log("legend: completed");
     }
 
     if (elementId === "delayed") {
+      chart.dispatchAction({ type: "legendToggleSelect", name: "delayed" });
+      // highlight
+      chart.dispatchAction({ type: "highlight", seriesName: "delayed" });
       console.log("legend: delayed");
     }
 
     if (elementId === "not-started") {
+      chart.dispatchAction({ type: "legendToggleSelect", name: "not-started" });
       console.log("legend: not-started");
     }
 
     if (elementId === "in-progress") {
+      chart.dispatchAction({ type: "legendToggleSelect", name: "in-progress" });
       console.log("legend: in-progress");
     }
   }
