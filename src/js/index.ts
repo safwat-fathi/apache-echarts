@@ -16,27 +16,29 @@
  */
 import "../styles.scss";
 import * as echarts from "echarts";
-// import moment from "moment";
 
 type EChartsOption = echarts.EChartsOption;
 type RenderItemParams = echarts.CustomSeriesRenderItemParams;
 type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
 type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 
-// grab btn elements
+// DOM elements
+const chartDom = <HTMLElement>document.getElementById("chart");
 const semesterBtn = document.getElementById("semesterly");
 const quarterBtn = document.getElementById("quarterly");
 const monthBtn = document.getElementById("monthly");
-const chartDom = <HTMLElement>document.getElementById("chart");
+const inProgressLegend = document.getElementById("in-progress");
+const delayedLegend = document.getElementById("delayed");
+const completedLegend = document.getElementById("completed");
+const notStartedLegend = document.getElementById("not-started");
 
 const chart = echarts.init(chartDom);
 
 // observe resize of chart parent
-new ResizeObserver(() => {
-  if (chart) {
+chart &&
+  new ResizeObserver(() => {
     chart.resize();
-  }
-}).observe(chartDom);
+  }).observe(chartDom);
 
 // globals
 const HEIGHT_RATIO = 0.5;
@@ -453,60 +455,93 @@ const option: EChartsOption = {
 chart.setOption(option);
 
 // listen to buttons events
-window.addEventListener("click", (e: MouseEvent) => {
-  if (
-    e.target !== semesterBtn &&
-    e.target !== monthBtn &&
-    e.target !== quarterBtn
-  ) {
-    return;
-  }
+window.addEventListener("click", (e: Event) => {
+  const target = <Element>e.target;
+
+  // if (
+  //   target !== semesterBtn &&
+  //   target !== monthBtn &&
+  //   target !== quarterBtn &&
+  //   (target !== completedLegend) &&
+  //   (target !== notStartedLegend) &&
+  //   (target !== inProgressLegend) &&
+  //   (target !== delayedLegend)
+  // ) {
+  //   return;
+  // }
 
   // toggle active class
-  document.querySelector(".active")?.classList.remove("active");
+  if (target === semesterBtn || target === monthBtn || target === quarterBtn) {
+    document.querySelector(".active")?.classList.remove("active");
 
-  const xAxis: any = option.xAxis;
-  const dataZoom: any = option.dataZoom;
-
-  // keep data zoom values across changes
-  dataZoom[0].start = yAxisZoomStart;
-  dataZoom[0].end = yAxisZoomEnd;
-  dataZoom[1].start = yAxisZoomStart;
-  dataZoom[1].end = yAxisZoomEnd;
-  dataZoom[2].start = xAxisZoomStart;
-  dataZoom[2].end = xAxisZoomEnd;
-
-  if (e.target === semesterBtn) {
-    semesterBtn?.classList.add("active");
-
+    const xAxis: any = option.xAxis;
     const dataZoom: any = option.dataZoom;
 
-    xAxis[1].axisLabel.formatter = (val: any) =>
-      subXAxisLabelFormatter("semester", val);
-    dataZoom[2].minSpan = 25.2;
+    // keep data zoom values across changes
+    dataZoom[0].start = yAxisZoomStart;
+    dataZoom[0].end = yAxisZoomEnd;
+    dataZoom[1].start = yAxisZoomStart;
+    dataZoom[1].end = yAxisZoomEnd;
+    dataZoom[2].start = xAxisZoomStart;
+    dataZoom[2].end = xAxisZoomEnd;
 
-    chart.setOption({ ...option, xAxis, dataZoom });
+    if (e.target === semesterBtn) {
+      semesterBtn?.classList.add("active");
+
+      const dataZoom: any = option.dataZoom;
+
+      xAxis[1].axisLabel.formatter = (val: any) =>
+        subXAxisLabelFormatter("semester", val);
+      dataZoom[2].minSpan = 25.2;
+
+      chart.setOption({ ...option, xAxis, dataZoom });
+    }
+
+    if (e.target === quarterBtn) {
+      quarterBtn?.classList.add("active");
+
+      xAxis[1].axisLabel.formatter = (value: any) =>
+        subXAxisLabelFormatter("quarter", value);
+      dataZoom[2].minSpan = 12.5;
+
+      chart.setOption({ ...option, xAxis, dataZoom });
+    }
+
+    if (e.target === monthBtn) {
+      monthBtn?.classList.add("active");
+
+      xAxis[1].axisLabel.formatter = (value: any) =>
+        subXAxisLabelFormatter("month", value);
+      dataZoom[2].minSpan = 8.15;
+
+      chart.setOption({ ...option, xAxis, dataZoom });
+    }
   }
 
-  if (e.target === quarterBtn) {
-    quarterBtn?.classList.add("active");
+  if (
+    target.closest("div#completed") ||
+    target.closest("div#not-started") ||
+    target.closest("div#delayed") ||
+    target.closest("div#in-progress")
+  ) {
+    const elementId = target.closest("div")?.getAttribute("id");
 
-    xAxis[1].axisLabel.formatter = (value: any) =>
-      subXAxisLabelFormatter("quarter", value);
-    dataZoom[2].minSpan = 12.5;
+    if (elementId === "completed") {
+      console.log("legend: completed");
+    }
 
-    chart.setOption({ ...option, xAxis, dataZoom });
-  }
+    if (elementId === "delayed") {
+      console.log("legend: delayed");
+    }
 
-  if (e.target === monthBtn) {
-    monthBtn?.classList.add("active");
+    if (elementId === "not-started") {
+      console.log("legend: not-started");
+    }
 
-    xAxis[1].axisLabel.formatter = (value: any) =>
-      subXAxisLabelFormatter("month", value);
-    dataZoom[2].minSpan = 8.15;
-
-    chart.setOption({ ...option, xAxis, dataZoom });
+    if (elementId === "in-progress") {
+      console.log("legend: in-progress");
+    }
   }
 });
 
-console.log(chart.getWidth());
+// console.log(chart.getWidth());
