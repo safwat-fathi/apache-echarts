@@ -31,7 +31,7 @@ const chartDom = <HTMLElement>document.getElementById("chart");
 
 const chart = echarts.init(chartDom);
 
-// observe resize of window
+// observe resize of chart parent
 new ResizeObserver(() => {
   if (chart) {
     chart.resize();
@@ -63,7 +63,9 @@ const timeData = [
   [9, "2010-02-1", "2013-01-1", 100, "Amira"],
   [10, "2010-05-1", "2013-08-1", 60, "Ola"],
   [11, "2010-12-1", "2013-12-1", 30, "Tarek"],
-  [12, "2016-11-1", "2022-01-1", 0, "Mahmoud"],
+  [12, "2016-10-23", "2018-04-17", 30, "Karam"],
+  [13, "2016-11-1", "2022-01-1", 0, "Mahmoud"],
+  [14, "2017-01-13", "2019-10-02", 60, "Amir"],
 ];
 
 let xAxisZoomStart = 60;
@@ -75,7 +77,7 @@ let textPositionConstant = 6;
 
 // * listen to data zoom
 // chart.on("dataZoom", function (e: any) {
-//   console.log("event", e);
+// console.log("event: ", e);
 //   return false;
 // });
 chart.on("dataZoom", (e: any) => {
@@ -104,27 +106,6 @@ chart.on("dataZoom", (e: any) => {
     textPositionConstant = 6;
   }
 });
-
-// const calculateQuarters = (min: number, max: number): string[] => {
-//   let quarters;
-
-//   const quartersCount = (max - min) * 4;
-//   quarters = new Array(quartersCount);
-
-//   let i = 0;
-//   while (i <= quartersCount - 4) {
-//     if (i % 4 === 0) {
-//       quarters[i] = "Q1";
-//       quarters[i + 1] = "Q2";
-//       quarters[i + 2] = "Q3";
-//       quarters[i + 3] = "Q4";
-//     }
-
-//     i++;
-//   }
-
-//   return quarters;
-// };
 
 const fillColor = (percent: number) => {
   return percent === 0
@@ -287,9 +268,18 @@ const renderGanttItem = (
   };
 };
 
-const subXAxisLabelFormatter = (type: "Q" | "MMM", value?: any) => {
+const subXAxisLabelFormatter = (type: "Q" | "MMM" | "SEM", value?: any) => {
   const format = moment(value).format(type);
-  return type === "Q" ? `Q${format}` : format;
+
+  if (type === "Q") return `Q${format}`;
+
+  if (type === "SEM") {
+    const quarter = moment(value).format("Q");
+
+    return +quarter < 3 ? "H1" : "H2";
+  }
+
+  return format;
 };
 
 const option: EChartsOption = {
@@ -404,7 +394,7 @@ const option: EChartsOption = {
       splitLine: {
         show: true,
         interval: function (_, value: string) {
-          return value === "Q1" ? true : false;
+          return value === "Q1" || value === "H1" ? true : false;
         },
       },
       offset: 0,
@@ -413,7 +403,6 @@ const option: EChartsOption = {
         color: "#a7a7a7",
         formatter: (value: any) => subXAxisLabelFormatter("Q", value),
       },
-      splitNumber: 4,
     },
   ],
   yAxis: {
@@ -480,25 +469,24 @@ window.addEventListener("click", (e: MouseEvent) => {
   dataZoom[2].start = xAxisZoomStart;
   dataZoom[2].end = xAxisZoomEnd;
 
-  // if (e.target === semesterBtn) {
-  //   quartersBG.style.display = "block";
-  //   semesterBtn?.classList.add("active");
+  if (e.target === semesterBtn) {
+    semesterBtn?.classList.add("active");
 
-  //   const xAxis: any = option.xAxis;
+    const dataZoom: any = option.dataZoom;
 
-  // 	xAxis[1].axisLabel.formatter = (val: any) => {
-  //     const week = moment(val).format("WW");
-  //     return week;
-  //   };
+    xAxis[1].axisLabel.formatter = (val: any) =>
+      subXAxisLabelFormatter("SEM", val);
+    dataZoom[2].minSpan = 25.2;
 
-  //   chart.setOption({ ...option, xAxis, dataZoom });
-  // }
+    chart.setOption({ ...option, xAxis, dataZoom });
+  }
 
   if (e.target === quarterBtn) {
     quarterBtn?.classList.add("active");
 
     xAxis[1].axisLabel.formatter = (value: any) =>
       subXAxisLabelFormatter("Q", value);
+    dataZoom[2].minSpan = 12.5;
 
     chart.setOption({ ...option, xAxis, dataZoom });
   }
@@ -508,6 +496,7 @@ window.addEventListener("click", (e: MouseEvent) => {
 
     xAxis[1].axisLabel.formatter = (value: any) =>
       subXAxisLabelFormatter("MMM", value);
+    dataZoom[2].minSpan = 8.15;
 
     chart.setOption({ ...option, xAxis, dataZoom });
   }
