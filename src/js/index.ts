@@ -14,9 +14,9 @@
 	TODO:	✔ provide min/max zoom level
 	TODO:	remove the year button ( semesterly/quarterly/monthly)
  */
-
+import "../styles.scss";
 import * as echarts from "echarts";
-import moment from "moment";
+// import moment from "moment";
 
 type EChartsOption = echarts.EChartsOption;
 type RenderItemParams = echarts.CustomSeriesRenderItemParams;
@@ -75,7 +75,7 @@ let yAxisZoomEnd = 100;
 // let textPositionConstant = 10;
 let textPositionConstant = 6;
 
-// * listen to data zoom
+// listen to data zoom event
 // chart.on("dataZoom", function (e: any) {
 // console.log("event: ", e);
 //   return false;
@@ -268,18 +268,17 @@ const renderGanttItem = (
   };
 };
 
-const subXAxisLabelFormatter = (type: "Q" | "MMM" | "SEM", value?: any) => {
-  const format = moment(value).format(type);
+const subXAxisLabelFormatter = (
+  type: "month" | "quarter" | "semester",
+  value?: any
+) => {
+  const date = new Date(value);
+  const month = date.toLocaleDateString("en-US", { month: "numeric" });
 
-  if (type === "Q") return `Q${format}`;
+  if (type === "quarter") return `Q${Math.ceil(+month / 3)}`;
+  if (type === "semester") return `H${Math.ceil(+month / 3) < 3 ? 1 : 2}`;
 
-  if (type === "SEM") {
-    const quarter = moment(value).format("Q");
-
-    return +quarter < 3 ? "H1" : "H2";
-  }
-
-  return format;
+  return date.toLocaleDateString("en-US", { month: "short" });
 };
 
 const option: EChartsOption = {
@@ -306,7 +305,8 @@ const option: EChartsOption = {
     },
   },
   grid: {
-    top: 100,
+    top: 80,
+    bottom: 40,
     right: 40,
   },
   dataZoom: [
@@ -316,8 +316,9 @@ const option: EChartsOption = {
       id: "scrollY",
       yAxisIndex: 0,
       width: 10,
+      height: "80%",
       right: 10,
-      top: 100,
+      top: 85,
       bottom: 20,
       handleSize: "300%",
       start: yAxisZoomStart,
@@ -333,7 +334,6 @@ const option: EChartsOption = {
       id: "insideY",
       yAxisIndex: 0,
       top: 100,
-      // bottom: 0,
       start: yAxisZoomStart,
       end: yAxisZoomEnd,
       zoomOnMouseWheel: false,
@@ -374,10 +374,17 @@ const option: EChartsOption = {
         showMinLabel: true,
         showMaxLabel: true,
         formatter: (value: any) => {
-          const year = moment(value).format("YYYY");
-          const q = moment(value).format("Q");
+          // const year = moment(value).format("YYYY");
+          // const q = moment(value).format("Q");
+          const year = new Date(value).toLocaleDateString("en-US", {
+            year: "numeric",
+          });
+          const month = new Date(value).toLocaleDateString("en-US", {
+            month: "numeric",
+          });
+          const quarter = Math.ceil(+month / 3);
 
-          return +q === 1 ? year : "";
+          return +quarter === 1 ? year : "";
         },
       },
     },
@@ -401,7 +408,7 @@ const option: EChartsOption = {
       axisLabel: {
         fontSize: 11,
         color: "#a7a7a7",
-        formatter: (value: any) => subXAxisLabelFormatter("Q", value),
+        formatter: (value: any) => subXAxisLabelFormatter("quarter", value),
       },
     },
   ],
@@ -475,7 +482,7 @@ window.addEventListener("click", (e: MouseEvent) => {
     const dataZoom: any = option.dataZoom;
 
     xAxis[1].axisLabel.formatter = (val: any) =>
-      subXAxisLabelFormatter("SEM", val);
+      subXAxisLabelFormatter("semester", val);
     dataZoom[2].minSpan = 25.2;
 
     chart.setOption({ ...option, xAxis, dataZoom });
@@ -485,7 +492,7 @@ window.addEventListener("click", (e: MouseEvent) => {
     quarterBtn?.classList.add("active");
 
     xAxis[1].axisLabel.formatter = (value: any) =>
-      subXAxisLabelFormatter("Q", value);
+      subXAxisLabelFormatter("quarter", value);
     dataZoom[2].minSpan = 12.5;
 
     chart.setOption({ ...option, xAxis, dataZoom });
@@ -495,9 +502,11 @@ window.addEventListener("click", (e: MouseEvent) => {
     monthBtn?.classList.add("active");
 
     xAxis[1].axisLabel.formatter = (value: any) =>
-      subXAxisLabelFormatter("MMM", value);
+      subXAxisLabelFormatter("month", value);
     dataZoom[2].minSpan = 8.15;
 
     chart.setOption({ ...option, xAxis, dataZoom });
   }
 });
+
+console.log(chart.getWidth());

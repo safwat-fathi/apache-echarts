@@ -18,7 +18,7 @@ module.exports = {
     index: entryPath,
   },
   resolve: {
-    extensions: [".ts", ".js"],
+    extensions: ["*", ".ts", ".js"],
   },
   // output directory
   output: {
@@ -28,21 +28,12 @@ module.exports = {
   },
   // plugins
   plugins: [
-    // provide jQuery & popper.js
-    // new webpack.ProvidePlugin({
-    //   $: "jquery",
-    //   jQuery: "jquery",
-    //   Popper: ["popper.js", "default"],
-    // }),
     // provide HTML pages
     new HtmlWebPackPlugin({
       filename: "index.html",
       template: "public/index.html",
       minify: false,
     }),
-    // new MiniCssExtractPlugin({
-    //   filename: "[name].bundle.css",
-    // }),
     // clean dist directory after every rebuild
     new CleanWebpackPlugin(),
     // Only update what has changed on hot reload
@@ -59,6 +50,10 @@ module.exports = {
         test: /\.(ts)$/,
         use: "ts-loader",
         exclude: /node_modules/,
+      },
+      {
+        test: /\.(s(a|c)ss)$/,
+        use: ["style-loader", "css-loader", "sass-loader"],
       },
     ],
   },
