@@ -1,19 +1,20 @@
 /*
-	TODO:	✔ maintain the year header
-	TODO:	✔ avoid clipping the off canvas
-	TODO:	avoid squeezing bars horizontally
+	// TODO: maintain the year header
+	// TODO: avoid clipping the off canvas
+	// TODO:	avoid squeezing bars horizontally
 	TODO:	meet UI
 		- clip path to images as circle
-		- custom legends
+		// - custom legends
 
-	TODO:	handle highlight series on legend hover
-	TODO:	✔ Data Zoom Margins
+	// TODO: handle highlight series on legend hover
+	// TODO: Data Zoom Margins
 	TODO:	Trimming overlapping text
 	TODO:	Centering titles inside the bars
 	TODO:	spacing between bar + avatars
 	TODO:	periods/bars
-	TODO:	✔ provide min/max zoom level
-	TODO:	✔ remove the year button ( semesterly/quarterly/monthly)
+	// TODO:	provide min/max zoom level
+	// TODO: remove the year button ( semesterly/quarterly/monthly)
+	TODO:	center labels 
  */
 import "../styles.scss";
 import * as echarts from "echarts";
@@ -60,14 +61,13 @@ const data = {
     [6, "2015-01-1", "2019-11-1", 80, "Anas"],
     [8, "2010-11-1", "2013-01-1", 90, "Lamyaa"],
     [10, "2010-05-1", "2013-08-1", 60, "Ola"],
-    [14, "2017-01-13", "2019-10-02", 60, "Amir"],
   ],
   complete: [
     [0, "2017-04-1", "2020-06-07", 100, "Ali"],
     [9, "2010-02-1", "2013-01-1", 100, "Amira"],
   ],
   notStarted: [
-    [14, "2017-01-13", "2019-10-02", 0, "Amir"],
+    [12, "2017-01-13", "2019-10-02", 0, "Amir"],
     [13, "2016-11-1", "2022-01-1", 0, "Mahmoud"],
     [5, "2011-11-1", "2013-01-1", 0, "Safwat"],
   ],
@@ -76,7 +76,7 @@ const data = {
     [2, "2017-05-1", "2017-12-01", 50, "Mostafa"],
     [1, "2011-02-1", "2013-09-19", 20, "Omar"],
     [11, "2010-12-1", "2013-12-1", 30, "Tarek"],
-    [12, "2016-10-23", "2018-04-17", 30, "Karam"],
+    [14, "2016-10-23", "2018-04-17", 30, "Karam"],
   ],
 };
 
@@ -321,9 +321,13 @@ const option: EChartsOption = {
     },
   },
   grid: {
+    // show: true,
+    // backgroundColor: "#000",
     top: 80,
+    left: 0,
     bottom: 40,
     right: 40,
+    // height: "80%",
   },
   dataZoom: [
     // Y axis scroll with slider
@@ -427,6 +431,7 @@ const option: EChartsOption = {
     },
   ],
   yAxis: {
+    boundaryGap: ["0.01%", "0.01%"],
     axisTick: { show: false },
     splitLine: { show: false },
     axisLine: { show: false },
