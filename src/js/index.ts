@@ -1,7 +1,7 @@
 /*
 	// TODO: maintain the year header
 	// TODO: avoid clipping the off canvas
-	// TODO:	avoid squeezing bars horizontally
+	TODO:	avoid squeezing bars horizontally
 	TODO:	meet UI
 		- clip path to images as circle
 		// - custom legends
@@ -12,7 +12,7 @@
 	TODO:	Centering titles inside the bars
 	TODO:	spacing between bar + avatars
 	TODO:	periods/bars
-	// TODO:	provide min/max zoom level
+	TODO:	✔ provide min/max zoom level
 	// TODO: remove the year button ( semesterly/quarterly/monthly)
 	TODO:	center labels 
  */
@@ -211,7 +211,23 @@ const renderGanttItem = (
           fill: "#eeedf0",
           stroke: "transparent",
         },
-        emphasis: {},
+        textContent: {
+          type: "text",
+          anchorX: 10,
+          style: {
+            text: `${percentage}%`,
+            truncateMinChar: 4,
+            width: width * 0.1,
+            overflow: "truncate",
+            ellipsis: "...",
+            fontWeight: "bold",
+          },
+        },
+        textConfig: {
+          position: "insideRight",
+          distance: 15,
+          // origin: "center",
+        },
       },
       {
         type: "rect",
@@ -221,39 +237,58 @@ const renderGanttItem = (
           fill: String(fillColor(+percentage)),
           stroke: "transparent",
         },
-      },
-      {
-        type: "text",
-        style: {
-          // @ts-ignore
-          text: width <= 160 ? "Mile..." : `Milestone 0${index + 1}`,
-          fill: "#000",
-          x: x + 20,
-          y: textPosition,
-          width,
-          fontWeight: "bold",
-          fontSize:
-            yAxisZoomEnd - yAxisZoomStart <= 51
-              ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
-              : 13,
+        textContent: {
+          type: "text",
+          style: {
+            text: `Milestone 0${+index + 1}`,
+            truncateMinChar: 4,
+            width: width * 0.15,
+            overflow: "truncate",
+            ellipsis: "...",
+            fontWeight: "bold",
+          },
+        },
+        textConfig: {
+          position: "insideLeft",
+          distance: 15,
         },
       },
-      {
-        type: "text",
-        style: {
-          // @ts-ignore
-          text: width > 100 ? `${percentage}%` : "",
-          fill: "#000",
-          x: percentage === 100 ? x + width - 60 : x + width - 50,
-          y: textPosition,
-          width,
-          fontWeight: "bold",
-          fontSize:
-            yAxisZoomEnd - yAxisZoomStart <= 51
-              ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
-              : 13,
-        },
-      },
+      // {
+      //   type: "text",
+      //   style: {
+      //     text: `Milestone 0${+index + 1}`,
+      //     // text: width <= 160 ? "Mile..." : `Milestone 0${index + 1}`,
+      //     // truncateMinChar: width <= 160 ? 4 : 10,
+
+      //     // ellipsis: "...",
+      //     // overflow: "truncate",
+      //     fill: "#000",
+      //     x: x + 20,
+      //     y: textPosition,
+      //     width,
+      //     fontWeight: "bold",
+      //     fontSize:
+      //       yAxisZoomEnd - yAxisZoomStart <= 51
+      //         ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
+      //         : 13,
+      //   },
+      // },
+      // {
+      //   type: "text",
+      //   style: {
+      //     // @ts-ignore
+      //     text: width > 100 ? `${percentage}%` : "",
+      //     fill: "#000",
+      //     x: percentage === 100 ? x + width - 60 : x + width - 50,
+      //     y: textPosition,
+      //     width,
+      //     fontWeight: "bold",
+      //     fontSize:
+      //       yAxisZoomEnd - yAxisZoomStart <= 51
+      //         ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
+      //         : 13,
+      //   },
+      // },
       {
         type: "image",
         style: {
@@ -271,10 +306,11 @@ const renderGanttItem = (
           text: String(employeeName),
           x: imagePosition + height + 10,
           y: textPosition,
-          fontSize:
-            yAxisZoomEnd - yAxisZoomStart <= 51
-              ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
-              : 13,
+          fontWeight: "bold",
+          // fontSize:
+          //   yAxisZoomEnd - yAxisZoomStart <= 51
+          //     ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
+          //     : 13,
         },
       },
     ],
@@ -327,7 +363,6 @@ const option: EChartsOption = {
     left: 0,
     bottom: 40,
     right: 40,
-    // height: "80%",
   },
   dataZoom: [
     // Y axis scroll with slider
@@ -393,6 +428,8 @@ const option: EChartsOption = {
         fontSize: 18,
         showMinLabel: true,
         showMaxLabel: true,
+        // align: "right",
+        // interval: 0,
         formatter: (value: any) => {
           const year = new Date(value).toLocaleDateString("en-US", {
             year: "numeric",
@@ -431,7 +468,7 @@ const option: EChartsOption = {
     },
   ],
   yAxis: {
-    boundaryGap: ["0.01%", "0.01%"],
+    boundaryGap: ["1%", "1%"],
     axisTick: { show: false },
     splitLine: { show: false },
     axisLine: { show: false },
