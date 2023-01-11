@@ -28,10 +28,10 @@ const chartDom = <HTMLElement>document.getElementById("chart");
 const semesterBtn = document.getElementById("semesterly");
 const quarterBtn = document.getElementById("quarterly");
 const monthBtn = document.getElementById("monthly");
-// const inProgressLegend = document.getElementById("in-progress");
-// const delayedLegend = document.getElementById("delayed");
-// const completedLegend = document.getElementById("completed");
-// const notStartedLegend = document.getElementById("not-started");
+const inProgressLegend = document.getElementById("in-progress");
+const delayedLegend = document.getElementById("delayed");
+const completedLegend = document.getElementById("completed");
+const notStartedLegend = document.getElementById("not-started");
 
 const chart = echarts.init(chartDom);
 
@@ -296,7 +296,7 @@ const subXAxisLabelFormatter = (
 
 const option: EChartsOption = {
   legend: {
-    show: true,
+    show: false,
   },
   // @ts-ignore
   tooltip: {
@@ -565,15 +565,11 @@ window.addEventListener("click", (e: Event) => {
 
     if (elementId === "completed") {
       chart.dispatchAction({ type: "legendToggleSelect", name: "complete" });
-      // highlight
-      chart.dispatchAction({ type: "highlight", seriesName: "complete" });
       console.log("legend: completed");
     }
 
     if (elementId === "delayed") {
       chart.dispatchAction({ type: "legendToggleSelect", name: "delayed" });
-      // highlight
-      chart.dispatchAction({ type: "highlight", seriesName: "delayed" });
       console.log("legend: delayed");
     }
 
@@ -589,4 +585,17 @@ window.addEventListener("click", (e: Event) => {
   }
 });
 
-// console.log(chart.getWidth());
+// toggle highlight series on legend hover
+[inProgressLegend, notStartedLegend, completedLegend, delayedLegend].forEach(
+  el => {
+    if (el) {
+      el.addEventListener("mouseenter", _ => {
+        chart.dispatchAction({ type: "highlight", seriesName: el.id });
+      });
+
+      el.addEventListener("mouseleave", _ => {
+        chart.dispatchAction({ type: "downplay", seriesName: el.id });
+      });
+    }
+  }
+);
