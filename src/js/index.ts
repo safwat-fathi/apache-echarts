@@ -1,20 +1,14 @@
 /*
-	// TODO: maintain the year header
-	// TODO: avoid clipping the off canvas
-	TODO:	avoid squeezing bars horizontally
-	TODO:	meet UI
+	TODO:	Main tasks
+	1-squeezing Horizontally
+	2-Trimming overlapping text
+	3-handle edge cases (exceed/below)
+	4-meet UI
 		- clip path to images as circle
-		// - custom legends
-
-	// TODO: handle highlight series on legend hover
-	// TODO: Data Zoom Margins
-	TODO:	Trimming overlapping text
-	TODO:	Centering titles inside the bars
-	TODO:	spacing between bar + avatars
-	TODO:	periods/bars
-	TODO:	✔ provide min/max zoom level
-	// TODO: remove the year button ( semesterly/quarterly/monthly)
-	TODO:	center labels 
+		
+	TODO: Enhancements
+	1- Custom Y Axis (check flight chart)
+	2- Maintain Bar label while scrolling off screen
  */
 import "../styles.scss";
 import * as echarts from "echarts";
