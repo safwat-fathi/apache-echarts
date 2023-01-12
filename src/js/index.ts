@@ -2,7 +2,7 @@
 	TODO:	Main tasks
 	1-squeezing Horizontally
 	2-Trimming overlapping text
-	3-handle edge cases (exceed/below)
+	// 3-handle edge cases (exceed/below)
 	4-meet UI
 		- clip path to images as circle
 
@@ -131,36 +131,55 @@ const renderGanttItem = (
   const start = api.coord([api.value(1), index]); // api.coord([x, y])
   const end = api.coord([api.value(2), index]); // api.coord([x, y])
   const percentage = api.value(3);
+  const milestone = `Milestone ${+index + 1}`;
   const employeeName = api.value(4);
-  const width = end[0] - start[0];
-
-  // console.log("api.size([0, 1]):", <number>(api.size && api.size([0, 1])));
-  // console.log(
-  //   "api.size([1.5, index]):",
-  //   <number>(api.size && api.size([1.5, index]))
-  // );
-  // console.log(
-  //   "api.size([2, index]):",
-  //   <number>(api.size && api.size([2, index]))
-  // );
-  // console.log(
-  //   "api.size([3, index]):",
-  //   <number>(api.size && api.size([3, index]))
-  // );
+  const barWidth = end[0] - start[0];
+  const percentageWidth = (barWidth * +percentage) / 100;
 
   // @ts-ignore
   const height = <number>(api.size([0, 1])[1] * HEIGHT_RATIO);
   const x = start[0];
   const y = start[1] - height / 2;
 
-  const imagePosition = x + width + 20;
+  const imagePosition = x + barWidth + 20;
   const textPosition = y + height / 2 - textPositionConstant;
+
+  const mileStoneTextWidth = echarts.format.getTextRect(milestone).width - 15;
+  const percentTextWidth =
+    echarts.format.getTextRect(`${percentage}%`).width - 15;
+
+  const milestoneText =
+    percentageWidth - mileStoneTextWidth > mileStoneTextWidth
+      ? milestone
+      : "..";
+
+  const percentageText =
+    barWidth - percentageWidth > percentTextWidth * 4.2
+      ? `${percentage}%`
+      : "..";
+
+  // if (index === 2) {
+  //   console.log(
+  //     "🚀 ~ file: index.ts:181 ~ barWidth - percentageWidth",
+  //     barWidth - percentageWidth
+  //   );
+  //   console.log("🚀 ~ file: index.ts:180 ~ barWidth", barWidth);
+  //   console.log("🚀 ~ file: index.ts:180 ~ percentageWidth", percentageWidth);
+  //   // console.log(
+  //   //   "🚀 ~ file: index.ts:181 ~ mileStoneTextWidth",
+  //   //   mileStoneTextWidth
+  //   // );
+  //   console.log("percentTextWidth", percentTextWidth);
+
+  //   // console.log(employeeName);
+  //   // console.log(milestoneText);
+  // }
 
   const rectShape = echarts.graphic.clipRectByRect(
     {
       x,
       y,
-      width,
+      width: barWidth,
       height,
     },
     {
@@ -179,7 +198,7 @@ const renderGanttItem = (
     {
       x,
       y,
-      width: (width * +percentage) / 100,
+      width: percentageWidth,
       height,
     },
     {
@@ -207,20 +226,14 @@ const renderGanttItem = (
         },
         textContent: {
           type: "text",
-          anchorX: 10,
           style: {
-            text: `${percentage}%`,
-            truncateMinChar: 4,
-            width: width * 0.1,
-            overflow: "truncate",
-            ellipsis: "...",
+            text: percentageText,
             fontWeight: "bold",
           },
         },
         textConfig: {
           position: "insideRight",
           distance: 15,
-          // origin: "center",
         },
       },
       {
@@ -234,11 +247,7 @@ const renderGanttItem = (
         textContent: {
           type: "text",
           style: {
-            text: `Milestone 0${+index + 1}`,
-            truncateMinChar: 4,
-            width: width * 0.15,
-            overflow: "truncate",
-            ellipsis: "...",
+            text: milestoneText,
             fontWeight: "bold",
           },
         },
@@ -413,26 +422,17 @@ const option: EChartsOption = {
       axisLine: {
         show: false,
       },
-      // boundaryGap: true,
       axisTick: { show: false },
       offset: 40,
       axisLabel: {
         color: "#fff",
         fontSize: 18,
-        // showMinLabel: false,
         showMaxLabel: true,
-        // align: "right",
-        // interval: 0,
         formatter: (value: any) => {
           const year = new Date(value).toLocaleDateString("en-US", {
             year: "numeric",
           });
-          const month = new Date(value).toLocaleDateString("en-US", {
-            month: "numeric",
-          });
-          const quarter = Math.ceil(+month / 3);
 
-          // return +quarter === 1 ? year : "";
           return year;
         },
       },
@@ -446,7 +446,6 @@ const option: EChartsOption = {
       axisTick: {
         show: false,
       },
-      // boundaryGap: true,
       position: "top",
       splitLine: {
         show: true,
@@ -458,7 +457,6 @@ const option: EChartsOption = {
       axisLabel: {
         fontSize: 11,
         color: "#a7a7a7",
-        // showMinLabel: false,
         showMaxLabel: true,
         formatter: (value: any) => subXAxisLabelFormatter("quarter", value),
       },

@@ -11,7 +11,6 @@
 
 #xAxisPrimaryBg {
   display: block;
-  // width: calc(100% - 7.5%);
   width: 100%;
   height: 50px;
   border-radius: 5px 5px 0 0;
@@ -25,12 +24,10 @@
 #xAxisSecondaryBg {
   display: block;
   position: absolute;
-  // width: calc(100% - 7.5%);
   width: 100%;
   height: 40px;
   background-color: #eeedf0;
   top: 45px;
-  // left: 7%;
   z-index: 10;
 }
 
