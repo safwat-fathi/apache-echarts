@@ -24,11 +24,11 @@
 
 #xAxisSecondaryBg {
   display: block;
+  position: absolute;
   // width: calc(100% - 7.5%);
   width: 100%;
   height: 40px;
   background-color: #eeedf0;
-  position: absolute;
   top: 45px;
   // left: 7%;
   z-index: 10;

@@ -5,7 +5,7 @@
 	3-handle edge cases (exceed/below)
 	4-meet UI
 		- clip path to images as circle
-		
+
 	TODO: Enhancements
 	1- Custom Y Axis (check flight chart)
 	2- Maintain Bar label while scrolling off screen
@@ -38,9 +38,9 @@ chart &&
 
 // globals
 const HEIGHT_RATIO = 0.5;
-const FONT_SIZE = 30;
-const MIN = "2010";
-const MAX = "2022";
+// const FONT_SIZE = 30;
+const MIN = "2009";
+const MAX = "2023";
 const COLORS = {
   completed: "#98e464",
   inProgress: "#47c0f4",
@@ -82,10 +82,10 @@ let yAxisZoomEnd = 100;
 let textPositionConstant = 6;
 
 // listen to data zoom event
-chart.on("mouseover", function (e: any) {
-  console.log("event: ", e);
-  // return false;
-});
+// chart.on("mouseover", function (e: any) {
+//   console.log("event: ", e);
+//   // return false;
+// });
 chart.on("dataZoom", (e: any) => {
   if (e.dataZoomId === "scrollY") {
     yAxisZoomStart = e.start;
@@ -351,12 +351,8 @@ const option: EChartsOption = {
     },
   },
   grid: {
-    // show: true,
-    // backgroundColor: "#000",
     top: 80,
-    left: 0,
     bottom: 40,
-    right: 40,
   },
   dataZoom: [
     // Y axis scroll with slider
@@ -365,10 +361,10 @@ const option: EChartsOption = {
       id: "scrollY",
       yAxisIndex: 0,
       width: 10,
-      height: "80%",
+      // height: 600,
       right: 10,
-      top: 85,
-      bottom: 20,
+      // top: 85,
+      bottom: 35,
       handleSize: "300%",
       start: yAxisZoomStart,
       end: yAxisZoomEnd,
@@ -395,7 +391,9 @@ const option: EChartsOption = {
       type: "slider",
       id: "scrollX",
       xAxisIndex: [0, 1],
+      width: 1000 - 30,
       height: 10,
+      right: 30,
       bottom: 20,
       handleSize: "300%",
       start: xAxisZoomStart,
@@ -415,12 +413,13 @@ const option: EChartsOption = {
       axisLine: {
         show: false,
       },
+      // boundaryGap: true,
       axisTick: { show: false },
       offset: 40,
       axisLabel: {
         color: "#fff",
         fontSize: 18,
-        showMinLabel: true,
+        // showMinLabel: false,
         showMaxLabel: true,
         // align: "right",
         // interval: 0,
@@ -433,7 +432,8 @@ const option: EChartsOption = {
           });
           const quarter = Math.ceil(+month / 3);
 
-          return +quarter === 1 ? year : "";
+          // return +quarter === 1 ? year : "";
+          return year;
         },
       },
     },
@@ -446,6 +446,7 @@ const option: EChartsOption = {
       axisTick: {
         show: false,
       },
+      // boundaryGap: true,
       position: "top",
       splitLine: {
         show: true,
@@ -457,6 +458,8 @@ const option: EChartsOption = {
       axisLabel: {
         fontSize: 11,
         color: "#a7a7a7",
+        // showMinLabel: false,
+        showMaxLabel: true,
         formatter: (value: any) => subXAxisLabelFormatter("quarter", value),
       },
     },
