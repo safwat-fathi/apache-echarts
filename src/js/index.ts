@@ -1,7 +1,7 @@
 /*
 	TODO:	Main tasks
 	1-squeezing Horizontally
-	2-Trimming overlapping text
+	2-Trimming overlapping text (fix when percent = 100%)
 	// 3-handle edge cases (exceed/below)
 	4-meet UI
 		- clip path to images as circle
