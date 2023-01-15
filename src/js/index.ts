@@ -1,7 +1,7 @@
 /*
 	TODO:	Main tasks
 	1-squeezing Horizontally
-	2-Trimming overlapping text (fix when percent = 100%)
+	// 2-Trimming overlapping text (fix when percent = 100%)
 	// 3-handle edge cases (exceed/below)
 	4-meet UI
 		- clip path to images as circle
@@ -154,7 +154,7 @@ const renderGanttItem = (
       : "..";
 
   const percentageText =
-    barWidth - percentageWidth > percentTextWidth * 4.2
+    barWidth - percentageWidth > percentTextWidth * 4.2 || percentageWidth > 80
       ? `${percentage}%`
       : "..";
 
@@ -602,22 +602,18 @@ window.addEventListener("click", (e: Event) => {
 
     if (elementId === "completed") {
       chart.dispatchAction({ type: "legendToggleSelect", name: "complete" });
-      console.log("legend: completed");
     }
 
     if (elementId === "delayed") {
       chart.dispatchAction({ type: "legendToggleSelect", name: "delayed" });
-      console.log("legend: delayed");
     }
 
     if (elementId === "not-started") {
       chart.dispatchAction({ type: "legendToggleSelect", name: "not-started" });
-      console.log("legend: not-started");
     }
 
     if (elementId === "in-progress") {
       chart.dispatchAction({ type: "legendToggleSelect", name: "in-progress" });
-      console.log("legend: in-progress");
     }
   }
 });
