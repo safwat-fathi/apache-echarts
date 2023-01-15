@@ -1,22 +1,20 @@
 /*
 	TODO:	Main tasks
-	1-squeezing Horizontally
-	// 2-Trimming overlapping text (fix when percent = 100%)
+	1- squeezing Horizontally
+	2-Trimming overlapping text
 	// 3-handle edge cases (exceed/below)
-	4-meet UI
+	4- meet UI
 		- clip path to images as circle
 
 	TODO: Enhancements
 	1- Custom Y Axis (check flight chart)
-	2- Maintain Bar label while scrolling off screen
+	// 2- Maintain Bar label while scrolling off screen
  */
 import "../styles.scss";
 import * as echarts from "echarts";
+import { renderGanttItem, subXAxisLabelFormatter } from "./helpers";
 
 type EChartsOption = echarts.EChartsOption;
-type RenderItemParams = echarts.CustomSeriesRenderItemParams;
-type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
-type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 
 // DOM elements
 const chartDom = <HTMLElement>document.getElementById("chart");
@@ -37,16 +35,10 @@ chart &&
   }).observe(chartDom);
 
 // globals
-const HEIGHT_RATIO = 0.5;
+// const HEIGHT_RATIO = 0.5;
 // const FONT_SIZE = 30;
 const MIN = "2009";
 const MAX = "2023";
-const COLORS = {
-  completed: "#98e464",
-  inProgress: "#47c0f4",
-  delayed: "#fba606",
-  notStarted: "#9193fc",
-};
 
 const data = {
   inProgress: [
@@ -78,8 +70,7 @@ let xAxisZoomStart = 60;
 let xAxisZoomEnd = 100;
 let yAxisZoomStart = 0;
 let yAxisZoomEnd = 100;
-// let textPositionConstant = 10;
-let textPositionConstant = 6;
+export let textPositionConstant = 6;
 
 // listen to data zoom event
 // chart.on("mouseover", function (e: any) {
@@ -112,226 +103,6 @@ chart.on("dataZoom", (e: any) => {
     textPositionConstant = 6;
   }
 });
-
-const fillColor = (percent: number) => {
-  return percent === 0
-    ? COLORS.notStarted
-    : percent <= 50
-    ? COLORS.delayed
-    : percent === 100
-    ? COLORS.completed
-    : COLORS.inProgress;
-};
-
-const renderGanttItem = (
-  params: RenderItemParams,
-  api: RenderItemAPI
-): RenderItemReturn => {
-  const index = api.value(0);
-  const start = api.coord([api.value(1), index]); // api.coord([x, y])
-  const end = api.coord([api.value(2), index]); // api.coord([x, y])
-  const percentage = api.value(3);
-  const milestone = `Milestone ${+index + 1}`;
-  const employeeName = api.value(4);
-  const barWidth = end[0] - start[0];
-  const percentageWidth = (barWidth * +percentage) / 100;
-
-  // @ts-ignore
-  const height = <number>(api.size([0, 1])[1] * HEIGHT_RATIO);
-  const x = start[0];
-  const y = start[1] - height / 2;
-
-  const imagePosition = x + barWidth + 20;
-  const textPosition = y + height / 2 - textPositionConstant;
-
-  const mileStoneTextWidth = echarts.format.getTextRect(milestone).width - 15;
-  const percentTextWidth =
-    echarts.format.getTextRect(`${percentage}%`).width - 15;
-
-  const milestoneText =
-    percentageWidth - mileStoneTextWidth > mileStoneTextWidth
-      ? milestone
-      : "..";
-
-  const percentageText =
-    barWidth - percentageWidth > percentTextWidth * 4.2 || percentageWidth > 80
-      ? `${percentage}%`
-      : "..";
-
-  // if (index === 2) {
-  //   console.log(
-  //     "🚀 ~ file: index.ts:181 ~ barWidth - percentageWidth",
-  //     barWidth - percentageWidth
-  //   );
-  //   console.log("🚀 ~ file: index.ts:180 ~ barWidth", barWidth);
-  //   console.log("🚀 ~ file: index.ts:180 ~ percentageWidth", percentageWidth);
-  //   // console.log(
-  //   //   "🚀 ~ file: index.ts:181 ~ mileStoneTextWidth",
-  //   //   mileStoneTextWidth
-  //   // );
-  //   console.log("percentTextWidth", percentTextWidth);
-
-  //   // console.log(employeeName);
-  //   // console.log(milestoneText);
-  // }
-
-  const rectShape = echarts.graphic.clipRectByRect(
-    {
-      x,
-      y,
-      width: barWidth,
-      height,
-    },
-    {
-      // @ts-ignore
-      x: params.coordSys.x,
-      // @ts-ignore
-      y: params.coordSys.y,
-      // @ts-ignore
-      width: params.coordSys.width,
-      // @ts-ignore
-      height: params.coordSys.height,
-    }
-  );
-
-  const rectPercent = echarts.graphic.clipRectByRect(
-    {
-      x,
-      y,
-      width: percentageWidth,
-      height,
-    },
-    {
-      // @ts-ignore
-      x: params.coordSys.x,
-      // @ts-ignore
-      y: params.coordSys.y,
-      // @ts-ignore
-      width: params.coordSys.width,
-      // @ts-ignore
-      height: params.coordSys.height,
-    }
-  );
-
-  return {
-    type: "group",
-    children: [
-      {
-        type: "rect",
-        ignore: !rectShape,
-        shape: { ...rectShape, r: 6 },
-        style: {
-          fill: "#eeedf0",
-          stroke: "transparent",
-        },
-        textContent: {
-          type: "text",
-          style: {
-            text: percentageText,
-            fontWeight: "bold",
-          },
-        },
-        textConfig: {
-          position: "insideRight",
-          distance: 15,
-        },
-      },
-      {
-        type: "rect",
-        ignore: !rectPercent,
-        shape: { ...rectPercent, r: 6 },
-        style: {
-          fill: String(fillColor(+percentage)),
-          stroke: "transparent",
-        },
-        textContent: {
-          type: "text",
-          style: {
-            text: milestoneText,
-            fontWeight: "bold",
-          },
-        },
-        textConfig: {
-          position: "insideLeft",
-          distance: 15,
-        },
-      },
-      // {
-      //   type: "text",
-      //   style: {
-      //     text: `Milestone 0${+index + 1}`,
-      //     // text: width <= 160 ? "Mile..." : `Milestone 0${index + 1}`,
-      //     // truncateMinChar: width <= 160 ? 4 : 10,
-
-      //     // ellipsis: "...",
-      //     // overflow: "truncate",
-      //     fill: "#000",
-      //     x: x + 20,
-      //     y: textPosition,
-      //     width,
-      //     fontWeight: "bold",
-      //     fontSize:
-      //       yAxisZoomEnd - yAxisZoomStart <= 51
-      //         ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
-      //         : 13,
-      //   },
-      // },
-      // {
-      //   type: "text",
-      //   style: {
-      //     // @ts-ignore
-      //     text: width > 100 ? `${percentage}%` : "",
-      //     fill: "#000",
-      //     x: percentage === 100 ? x + width - 60 : x + width - 50,
-      //     y: textPosition,
-      //     width,
-      //     fontWeight: "bold",
-      //     fontSize:
-      //       yAxisZoomEnd - yAxisZoomStart <= 51
-      //         ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
-      //         : 13,
-      //   },
-      // },
-      {
-        type: "image",
-        style: {
-          image:
-            "https://pbs.twimg.com/profile_images/1329949157486854150/2vhx3rm9_400x400.jpg",
-          x: imagePosition,
-          y,
-          width: height * 0.9,
-          height: height * 0.9,
-        },
-      },
-      {
-        type: "text",
-        style: {
-          text: String(employeeName),
-          x: imagePosition + height + 10,
-          y: textPosition,
-          fontWeight: "bold",
-          // fontSize:
-          //   yAxisZoomEnd - yAxisZoomStart <= 51
-          //     ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
-          //     : 13,
-        },
-      },
-    ],
-  };
-};
-
-const subXAxisLabelFormatter = (
-  type: "month" | "quarter" | "semester",
-  value?: any
-) => {
-  const date = new Date(value);
-  const month = date.toLocaleDateString("en-US", { month: "numeric" });
-
-  if (type === "quarter") return `Q${Math.ceil(+month / 3)}`;
-  if (type === "semester") return `H${Math.ceil(+month / 3) < 3 ? 1 : 2}`;
-
-  return date.toLocaleDateString("en-US", { month: "short" });
-};
 
 const option: EChartsOption = {
   legend: {
