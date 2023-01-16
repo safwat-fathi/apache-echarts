@@ -50,9 +50,6 @@ export const renderGanttItem = (
   const milestoneTextWidth = echarts.format.getTextRect(
     `Milestone ${+index + 1}`
   ).width;
-  const percentageTextTextWidth = echarts.format.getTextRect(
-    `${percentage}%`
-  ).width;
 
   const HEIGHT_RATIO = 0.5;
 
@@ -61,38 +58,6 @@ export const renderGanttItem = (
   const x = start[0];
   const y = start[1] - height / 2;
 
-  if (index === 4) {
-    console.log(employeeName);
-
-    console.log("x ", x);
-    console.log("barWidth", barWidth);
-    console.log("x - barWidth", x - barWidth);
-
-    // console.log("🚀 ~ file: helpers.ts:48 ~ barWidth", barWidth);
-    // console.log(
-    //   "🚀 ~ file: helpers.ts:48 ~ milestoneTextWidth",
-    //   milestoneTextWidth
-    // );
-    // console.log("🚀 ~ percentage point ~ x + barWidth - 15", x + barWidth - 15);
-    // console.log(
-    //   "🚀 ~ file: helpers.ts:48 ~ x + milestoneTextWidth",
-    //   x + milestoneTextWidth
-    // );
-    // console.log("🚀 ~ file: helpers.ts:48 ~ x ", x);
-    // console.log(
-    //   "🚀 ~ file: helpers.ts:53 ~ percentageTextTextWidth",
-    //   percentageTextTextWidth
-    // );
-    // console.log(
-    //   "🚀 ~ file: helpers.ts:82 ~ percentageTextTextWidth",
-    //   percentageTextTextWidth
-    // );
-    // console.log(
-    //   "🚀 ~ file: helpers.ts:91 ~ x + barWidth >= percentageTextTextWidth/ 3.5",
-    //   x + barWidth <= percentageTextTextWidth / 3.5
-    // );
-  }
-  // const milestone = `Milestone ${+index + 1}`;
   const milestoneText =
     x + barWidth >= milestoneTextWidth * 3.5 ? `Milestone ${+index + 1}` : "";
   const percentageText =

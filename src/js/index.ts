@@ -11,16 +11,21 @@
 	// 2- Maintain Bar label while scrolling off screen
  */
 import "../styles.scss";
+import data from "../../data.json";
 import * as echarts from "echarts";
 import { renderGanttItem, subXAxisLabelFormatter } from "./helpers";
 
 type EChartsOption = echarts.EChartsOption;
 
-// DOM elements
+/* DOM elements */
+
+// chart container
 const chartDom = <HTMLElement>document.getElementById("chart");
+// buttons
 const semesterBtn = document.getElementById("semesterly");
 const quarterBtn = document.getElementById("quarterly");
 const monthBtn = document.getElementById("monthly");
+// legends
 const inProgressLegend = document.getElementById("in-progress");
 const delayedLegend = document.getElementById("delayed");
 const completedLegend = document.getElementById("completed");
@@ -40,30 +45,26 @@ chart &&
 const MIN = "2009";
 const MAX = "2023";
 
-const data = {
-  inProgress: [
-    [3, "2011-11-1", "2019-05-1", 90, "Khaled"],
-    [4, "2019-11-1", "2022-01-1", 60, "Karam"],
-    [6, "2015-01-1", "2019-11-1", 80, "Anas"],
-    [8, "2010-11-1", "2013-01-1", 90, "Lamyaa"],
-    [10, "2010-05-1", "2013-08-1", 60, "Ola"],
-  ],
-  complete: [
-    [0, "2017-04-1", "2020-06-07", 100, "Ali"],
-    [9, "2010-02-1", "2013-01-1", 100, "Amira"],
-  ],
-  notStarted: [
-    [12, "2017-01-13", "2019-10-02", 0, "Amir"],
-    [13, "2016-11-1", "2022-01-1", 0, "Mahmoud"],
-    [5, "2011-11-1", "2013-01-1", 0, "Safwat"],
-  ],
-  delayed: [
-    [7, "2013-01-1", "2014-11-1", 40, "Kareem"],
-    [2, "2017-05-1", "2017-12-01", 50, "Mostafa"],
-    [1, "2011-02-1", "2013-09-19", 20, "Omar"],
-    [11, "2010-12-1", "2013-12-1", 30, "Tarek"],
-    [14, "2016-10-23", "2018-04-17", 30, "Karam"],
-  ],
+const extractNames = () => {
+  let allData = [
+    ...data.complete,
+    ...data.delayed,
+    ...data.inProgress,
+    ...data.notStarted,
+  ];
+
+  allData = allData.sort((a: any, b: any) => {
+    return a[0] < b[0] ? -1 : 1;
+  });
+
+  let names: any[] = [];
+
+  let i = 0;
+  for (; i < allData.length; i++) {
+    names = [...names, allData[i][allData[i].length - 1]];
+  }
+
+  return names;
 };
 
 export let textPositionConstant = 6;
@@ -229,11 +230,21 @@ const option: EChartsOption = {
     },
   ],
   yAxis: {
-    boundaryGap: ["1%", "1%"],
+    type: "category",
+    // boundaryGap: ["1%", "1%"],
+    boundaryGap: true,
+    min: -1,
+    max: 15,
     axisTick: { show: false },
     splitLine: { show: false },
     axisLine: { show: false },
-    axisLabel: { show: false },
+    data: extractNames(),
+    axisLabel: {
+      show: true,
+      formatter: function (value: any, index: number) {
+        return value;
+      },
+    },
   },
   series: [
     {
