@@ -1,7 +1,7 @@
 /*
 	TODO:	Main tasks
 	1- squeezing Horizontally
-	2-Trimming overlapping text
+	// 2-Trimming overlapping text
 	// 3-handle edge cases (exceed/below)
 	4- meet UI
 		- clip path to images as circle
@@ -67,8 +67,8 @@ const data = {
 };
 
 export let textPositionConstant = 6;
-let xAxisZoomStart = 60;
-let xAxisZoomEnd = 100;
+let xAxisZoomStart = 95;
+let xAxisZoomEnd = 60;
 let yAxisZoomStart = 0;
 let yAxisZoomEnd = 100;
 

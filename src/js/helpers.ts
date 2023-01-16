@@ -43,10 +43,16 @@ export const renderGanttItem = (
   const start = api.coord([api.value(1), index]); // api.coord([x, y])
   const end = api.coord([api.value(2), index]); // api.coord([x, y])
   const percentage = api.value(3);
-  const milestone = `Milestone ${+index + 1}`;
   const employeeName = api.value(4);
   const barWidth = end[0] - start[0];
   const percentageWidth = (barWidth * +percentage) / 100;
+
+  const milestoneTextWidth = echarts.format.getTextRect(
+    `Milestone ${+index + 1}`
+  ).width;
+  const percentageTextTextWidth = echarts.format.getTextRect(
+    `${percentage}%`
+  ).width;
 
   const HEIGHT_RATIO = 0.5;
 
@@ -54,6 +60,43 @@ export const renderGanttItem = (
   const height = <number>(api.size([0, 1])[1] * HEIGHT_RATIO);
   const x = start[0];
   const y = start[1] - height / 2;
+
+  if (index === 4) {
+    console.log(employeeName);
+
+    console.log("x ", x);
+    console.log("barWidth", barWidth);
+    console.log("x - barWidth", x - barWidth);
+
+    // console.log("🚀 ~ file: helpers.ts:48 ~ barWidth", barWidth);
+    // console.log(
+    //   "🚀 ~ file: helpers.ts:48 ~ milestoneTextWidth",
+    //   milestoneTextWidth
+    // );
+    // console.log("🚀 ~ percentage point ~ x + barWidth - 15", x + barWidth - 15);
+    // console.log(
+    //   "🚀 ~ file: helpers.ts:48 ~ x + milestoneTextWidth",
+    //   x + milestoneTextWidth
+    // );
+    // console.log("🚀 ~ file: helpers.ts:48 ~ x ", x);
+    // console.log(
+    //   "🚀 ~ file: helpers.ts:53 ~ percentageTextTextWidth",
+    //   percentageTextTextWidth
+    // );
+    // console.log(
+    //   "🚀 ~ file: helpers.ts:82 ~ percentageTextTextWidth",
+    //   percentageTextTextWidth
+    // );
+    // console.log(
+    //   "🚀 ~ file: helpers.ts:91 ~ x + barWidth >= percentageTextTextWidth/ 3.5",
+    //   x + barWidth <= percentageTextTextWidth / 3.5
+    // );
+  }
+  // const milestone = `Milestone ${+index + 1}`;
+  const milestoneText =
+    x + barWidth >= milestoneTextWidth * 3.5 ? `Milestone ${+index + 1}` : "";
+  const percentageText =
+    x - barWidth - milestoneTextWidth <= barWidth ? `${percentage}%` : "";
 
   const imagePosition = x + barWidth + 20;
   const textPosition = y + height / 2 - textPositionConstant;
@@ -110,7 +153,7 @@ export const renderGanttItem = (
         textContent: {
           type: "text",
           style: {
-            text: `${percentage}%`,
+            text: percentageText,
             fontWeight: "bold",
             width: barWidth * 0.25,
             overflow: "truncate",
@@ -133,9 +176,9 @@ export const renderGanttItem = (
         textContent: {
           type: "text",
           style: {
-            text: milestone,
+            text: milestoneText,
             fontWeight: "bold",
-            width: barWidth * 0.25,
+            width: barWidth * 0.3,
             overflow: "truncate",
             ellipsis: "..",
           },
