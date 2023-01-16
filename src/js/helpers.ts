@@ -5,7 +5,7 @@ type RenderItemParams = echarts.CustomSeriesRenderItemParams;
 type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
 type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 
-export const fillColor = (percent: number) => {
+const fillColor = (percent: number) => {
   const COLORS = {
     completed: "#98e464",
     inProgress: "#47c0f4",
@@ -20,22 +20,6 @@ export const fillColor = (percent: number) => {
     : percent === 100
     ? COLORS.completed
     : COLORS.inProgress;
-};
-
-/**
- * Calculate trimmed text based on width
- * @param {number | string} containerWidth - The container width of the text
- * @param {number | string} textWidth - The container width of the text
- * @returns {number} characters to trim
- */
-export const trimText = (
-  containerWidth: string | number,
-  textWidth: string | number
-): number => {
-  console.log("containerWidth: ", containerWidth);
-  console.log("textWidth: ", textWidth);
-
-  return 4;
 };
 
 export const subXAxisLabelFormatter = (
@@ -64,7 +48,6 @@ export const renderGanttItem = (
   const barWidth = end[0] - start[0];
   const percentageWidth = (barWidth * +percentage) / 100;
 
-  // const textPositionConstant = 6;
   const HEIGHT_RATIO = 0.5;
 
   // @ts-ignore
@@ -74,26 +57,6 @@ export const renderGanttItem = (
 
   const imagePosition = x + barWidth + 20;
   const textPosition = y + height / 2 - textPositionConstant;
-
-  const mileStoneTextWidth = echarts.format.getTextRect(milestone).width - 15;
-  const percentTextWidth =
-    echarts.format.getTextRect(`${percentage}%`).width - 15;
-
-  if (index === 2) {
-    console.log(employeeName);
-
-    trimText(barWidth, percentTextWidth);
-  }
-
-  const milestoneText =
-    percentageWidth - mileStoneTextWidth > mileStoneTextWidth
-      ? milestone
-      : "..";
-
-  const percentageText =
-    barWidth - percentageWidth > percentTextWidth * 4.2 || percentageWidth > 80
-      ? `${percentage}%`
-      : "..";
 
   const rectShape = echarts.graphic.clipRectByRect(
     {
@@ -147,8 +110,11 @@ export const renderGanttItem = (
         textContent: {
           type: "text",
           style: {
-            text: percentageText,
+            text: `${percentage}%`,
             fontWeight: "bold",
+            width: barWidth * 0.25,
+            overflow: "truncate",
+            ellipsis: "..",
           },
         },
         textConfig: {
@@ -167,8 +133,11 @@ export const renderGanttItem = (
         textContent: {
           type: "text",
           style: {
-            text: milestoneText,
+            text: milestone,
             fontWeight: "bold",
+            width: barWidth * 0.25,
+            overflow: "truncate",
+            ellipsis: "..",
           },
         },
         textConfig: {

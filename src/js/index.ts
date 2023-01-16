@@ -66,17 +66,12 @@ const data = {
   ],
 };
 
+export let textPositionConstant = 6;
 let xAxisZoomStart = 60;
 let xAxisZoomEnd = 100;
 let yAxisZoomStart = 0;
 let yAxisZoomEnd = 100;
-export let textPositionConstant = 6;
 
-// listen to data zoom event
-// chart.on("mouseover", function (e: any) {
-//   console.log("event: ", e);
-//   // return false;
-// });
 chart.on("dataZoom", (e: any) => {
   if (e.dataZoomId === "scrollY") {
     yAxisZoomStart = e.start;
