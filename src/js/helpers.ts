@@ -35,6 +35,23 @@ export const subXAxisLabelFormatter = (
   return date.toLocaleDateString("en-US", { month: "short" });
 };
 
+// const mem = () => {
+//   let cache: any = {};
+
+//   return (x: number) => {
+//     // console.log("firstX:", firstX);
+//     if (x in cache) {
+//       // console.log("firstX:", cache[x]);
+//       return cache[x];
+//     } else {
+//       // console.log("x:", x);
+//       cache[x] = x;
+//     }
+//   };
+// };
+
+// const memoX = mem();
+
 export const renderGanttItem = (
   params: RenderItemParams,
   api: RenderItemAPI
@@ -47,9 +64,10 @@ export const renderGanttItem = (
   const barWidth = end[0] - start[0];
   const percentageWidth = (barWidth * +percentage) / 100;
 
-  const milestoneTextWidth = echarts.format.getTextRect(
+  const mainTextWidth = echarts.format.getTextRect(
     `Milestone ${+index + 1}`
   ).width;
+  const subTextWidth = echarts.format.getTextRect(`${percentage}%`).width;
 
   const HEIGHT_RATIO = 0.5;
 
@@ -58,10 +76,33 @@ export const renderGanttItem = (
   const x = start[0];
   const y = start[1] - height / 2;
 
-  const milestoneText =
-    x + barWidth >= milestoneTextWidth * 3.5 ? `Milestone ${+index + 1}` : "";
-  const percentageText =
-    x - barWidth - milestoneTextWidth <= barWidth ? `${percentage}%` : "";
+  // const mainText = `Milestone ${+index + 1}`;
+  // const mainText =
+  //   x + barWidth >= mainTextWidth * 3.5 ? `Milestone ${+index + 1}` : "";
+  const mainText =
+    (x + barWidth) / 3 >= mainTextWidth ? `Milestone ${+index + 1}` : "";
+  // const subText = `${percentage}%`;
+  // const subText = x / 3 >= x - 100 ? `${percentage}%` : "";
+  const subText = barWidth > subTextWidth ? `${percentage}%` : "";
+
+  if (index === 7) {
+    console.log("employeeName: ", employeeName);
+    // const firstX = memoX(x);
+    // console.log("firstX", firstX);
+
+    console.log("x: ", x);
+    console.log("barWidth: ", barWidth);
+    console.log("subTextWidth: ", subTextWidth);
+    console.log("width - x: ", 1000 - x);
+    // console.log("x > barWidth + subTextWidth: ", x > barWidth + subTextWidth);
+    // console.log("x + barWidth: ", x + barWidth);
+    // console.log("x - barWidth - mainTextWidth: ", x - barWidth - mainTextWidth);
+    // console.log("x - barWidth: ", x - barWidth);
+    // console.log(" barWidth - x: ", barWidth - x);
+    // console.log("x + barWidth: ", x + barWidth);
+    // console.log("x + barWidth - x > barWidth: ", x + barWidth - x > barWidth);
+    // console.log("subTextWidth: ", subTextWidth);
+  }
 
   const imagePosition = x + barWidth + 20;
   const textPosition = y + height / 2 - textPositionConstant;
@@ -118,7 +159,7 @@ export const renderGanttItem = (
         textContent: {
           type: "text",
           style: {
-            text: percentageText,
+            text: subText,
             fontWeight: "bold",
             width: barWidth * 0.25,
             overflow: "truncate",
@@ -141,7 +182,7 @@ export const renderGanttItem = (
         textContent: {
           type: "text",
           style: {
-            text: milestoneText,
+            text: mainText,
             fontWeight: "bold",
             width: barWidth * 0.3,
             overflow: "truncate",

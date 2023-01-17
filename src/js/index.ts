@@ -32,6 +32,7 @@ const completedLegend = document.getElementById("completed");
 const notStartedLegend = document.getElementById("not-started");
 
 const chart = echarts.init(chartDom);
+console.log(chart.getWidth());
 
 // observe resize of chart parent
 chart &&
@@ -68,8 +69,8 @@ const extractNames = () => {
 };
 
 export let textPositionConstant = 6;
-let xAxisZoomStart = 95;
-let xAxisZoomEnd = 60;
+let xAxisZoomStart = 40;
+let xAxisZoomEnd = 92.9;
 let yAxisZoomStart = 0;
 let yAxisZoomEnd = 100;
 
@@ -233,7 +234,7 @@ const option: EChartsOption = {
     type: "category",
     // boundaryGap: ["1%", "1%"],
     boundaryGap: true,
-    min: -1,
+    min: 0,
     max: 15,
     axisTick: { show: false },
     splitLine: { show: false },
@@ -241,8 +242,16 @@ const option: EChartsOption = {
     data: extractNames(),
     axisLabel: {
       show: true,
+      fontWeight: "bold",
+      // color: "#fff",
+      // padding: 2,
+      // backgroundColor: "#005371",
+      // backgroundColor: {
+      //   image:
+      //     '"https://pbs.twimg.com/profile_images/1329949157486854150/2vhx3rm9_400x400.jpg"',
+      // },
       formatter: function (value: any, index: number) {
-        return value;
+        return `${value}`;
       },
     },
   },
