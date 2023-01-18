@@ -145,7 +145,7 @@ export const renderGanttItem = (
         },
         textConfig: {
           position: "insideRight",
-          distance: 15,
+          // distance: 15,
         },
       },
       {
@@ -168,7 +168,7 @@ export const renderGanttItem = (
         },
         textConfig: {
           position: "insideLeft",
-          distance: 15,
+          // distance: 15,
         },
       },
       {

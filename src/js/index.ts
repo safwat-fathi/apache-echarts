@@ -1,14 +1,15 @@
 /*
 	TODO:	Main tasks
-	1- squeezing Horizontally
-	// 2-Trimming overlapping text
-	// 3-handle edge cases (exceed/below)
-	4- meet UI
+	- remove repeated years
+	- colors on hover on bars (maybe add border on bars if hovered)
+	- centering images
+	- toggle legend color if clicked
+	- update chart on series non-visible 
+	- meet UI
 		- clip path to images as circle
 
 	TODO: Enhancements
-	1- Custom Y Axis (check flight chart)
-	// 2- Maintain Bar label while scrolling off screen
+	- line marker on hover for start and end of bars
  */
 import "../styles.scss";
 import data from "../../data.json";
@@ -190,6 +191,9 @@ const option: EChartsOption = {
       axisLine: {
         show: false,
       },
+      // interval: 12,
+      splitNumber: 0,
+      maxInterval: 3600 * 1000 * 24 * 30 * 12,
       axisTick: { show: false },
       offset: 40,
       axisLabel: {
