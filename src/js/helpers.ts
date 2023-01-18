@@ -67,7 +67,7 @@ export const renderGanttItem = (
   const mainTextWidth = echarts.format.getTextRect(
     `Milestone ${+index + 1}`
   ).width;
-  const subTextWidth = echarts.format.getTextRect(`${percentage}%`).width;
+  // const subTextWidth = echarts.format.getTextRect(`${percentage}%`).width;
 
   const HEIGHT_RATIO = 0.5;
 

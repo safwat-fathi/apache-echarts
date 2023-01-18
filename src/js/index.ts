@@ -75,6 +75,8 @@ let xAxisZoomEnd = 92.9;
 let yAxisZoomStart = 0;
 let yAxisZoomEnd = 100;
 
+let subAxisType: "quarter" | "month" | "semester" = "quarter";
+
 chart.on("dataZoom", (e: any) => {
   if (e.dataZoomId === "scrollY") {
     yAxisZoomStart = e.start;
@@ -191,9 +193,13 @@ const option: EChartsOption = {
       axisLine: {
         show: false,
       },
+      // * day = 60 * 60 * 1000 * 24
+      // * month = day * 30
+      // * quarter = month * 4
+      // minInterval: 60 * 60 * 1000 * 24 * 30 * 4,
+      // maxInterval: 60 * 60 * 1000 * 24 * 30 * 4,
       // interval: 12,
-      splitNumber: 0,
-      maxInterval: 3600 * 1000 * 24 * 30 * 12,
+      // splitNumber: 1,
       axisTick: { show: false },
       offset: 40,
       axisLabel: {
@@ -205,7 +211,29 @@ const option: EChartsOption = {
             year: "numeric",
           });
 
-          return year;
+          const month = new Date(value).toLocaleDateString("en-US", {
+            month: "numeric",
+          });
+
+          const quarter = Math.ceil(+month / 3);
+          const semester = Math.ceil(+month / 2);
+
+          // console.log("subAxisType", subAxisType);
+          if (subAxisType === "quarter") {
+            return quarter === 1 ? year : "";
+          }
+          if (subAxisType === "month") {
+            return +month === 1 ? year : "";
+          }
+          // console.log("wdwad");
+          // console.log(+month);
+          // console.log(+month / 2);
+          // console.log(+month / 2 === 1);
+          // console.log(+month / 2 === 6);
+
+          // return +month / 2 === 1 || +month / 2 === 6 ? year : "";
+
+          return +semester === 1 ? year : "";
         },
       },
     },
@@ -352,6 +380,8 @@ window.addEventListener("click", (e: Event) => {
     if (e.target === semesterBtn) {
       semesterBtn?.classList.add("active");
 
+      subAxisType = "semester";
+
       const dataZoom: any = option.dataZoom;
 
       xAxis[1].axisLabel.formatter = (val: any) =>
@@ -364,6 +394,8 @@ window.addEventListener("click", (e: Event) => {
     if (e.target === quarterBtn) {
       quarterBtn?.classList.add("active");
 
+      subAxisType = "quarter";
+
       xAxis[1].axisLabel.formatter = (value: any) =>
         subXAxisLabelFormatter("quarter", value);
       dataZoom[2].minSpan = 12.5;
@@ -374,9 +406,12 @@ window.addEventListener("click", (e: Event) => {
     if (e.target === monthBtn) {
       monthBtn?.classList.add("active");
 
+      subAxisType = "month";
+
       xAxis[1].axisLabel.formatter = (value: any) =>
         subXAxisLabelFormatter("month", value);
-      dataZoom[2].minSpan = 8.15;
+      // dataZoom[2].minSpan = 8.15;
+      dataZoom[2].minSpan = 7;
 
       chart.setOption({ ...option, xAxis, dataZoom });
     }
