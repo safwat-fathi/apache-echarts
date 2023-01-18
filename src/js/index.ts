@@ -32,7 +32,7 @@ const completedLegend = document.getElementById("completed");
 const notStartedLegend = document.getElementById("not-started");
 
 const chart = echarts.init(chartDom);
-console.log(chart.getWidth());
+export const chartWidth = chart.getWidth();
 
 // observe resize of chart parent
 chart &&

@@ -1,5 +1,5 @@
 import * as echarts from "echarts";
-import { textPositionConstant } from ".";
+import { chartWidth, textPositionConstant } from ".";
 
 type RenderItemParams = echarts.CustomSeriesRenderItemParams;
 type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
@@ -76,33 +76,10 @@ export const renderGanttItem = (
   const x = start[0];
   const y = start[1] - height / 2;
 
-  // const mainText = `Milestone ${+index + 1}`;
-  // const mainText =
-  //   x + barWidth >= mainTextWidth * 3.5 ? `Milestone ${+index + 1}` : "";
   const mainText =
     (x + barWidth) / 3 >= mainTextWidth ? `Milestone ${+index + 1}` : "";
-  // const subText = `${percentage}%`;
-  // const subText = x / 3 >= x - 100 ? `${percentage}%` : "";
-  const subText = barWidth > subTextWidth ? `${percentage}%` : "";
-
-  if (index === 7) {
-    console.log("employeeName: ", employeeName);
-    // const firstX = memoX(x);
-    // console.log("firstX", firstX);
-
-    console.log("x: ", x);
-    console.log("barWidth: ", barWidth);
-    console.log("subTextWidth: ", subTextWidth);
-    console.log("width - x: ", 1000 - x);
-    // console.log("x > barWidth + subTextWidth: ", x > barWidth + subTextWidth);
-    // console.log("x + barWidth: ", x + barWidth);
-    // console.log("x - barWidth - mainTextWidth: ", x - barWidth - mainTextWidth);
-    // console.log("x - barWidth: ", x - barWidth);
-    // console.log(" barWidth - x: ", barWidth - x);
-    // console.log("x + barWidth: ", x + barWidth);
-    // console.log("x + barWidth - x > barWidth: ", x + barWidth - x > barWidth);
-    // console.log("subTextWidth: ", subTextWidth);
-  }
+  const subText =
+    chartWidth - x > 100 + mainTextWidth * 2 ? `${percentage}%` : "";
 
   const imagePosition = x + barWidth + 20;
   const textPosition = y + height / 2 - textPositionConstant;
