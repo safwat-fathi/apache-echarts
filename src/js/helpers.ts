@@ -35,23 +35,6 @@ export const subXAxisLabelFormatter = (
   return date.toLocaleDateString("en-US", { month: "short" });
 };
 
-// const mem = () => {
-//   let cache: any = {};
-
-//   return (x: number) => {
-//     // console.log("firstX:", firstX);
-//     if (x in cache) {
-//       // console.log("firstX:", cache[x]);
-//       return cache[x];
-//     } else {
-//       // console.log("x:", x);
-//       cache[x] = x;
-//     }
-//   };
-// };
-
-// const memoX = mem();
-
 export const renderGanttItem = (
   params: RenderItemParams,
   api: RenderItemAPI
