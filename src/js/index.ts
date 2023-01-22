@@ -1,7 +1,7 @@
 /*
 	TODO:	Main tasks
 	// - remove repeated years
-	- toggle legend color if clicked
+	// - toggle legend color if clicked
 	- colors on hover on bars (maybe add border on bars if hovered)
 	- centering images
 	- update chart y axis on series toggled from legend 
@@ -17,12 +17,29 @@ import * as echarts from "echarts";
 import {
   extractNames,
   filterYAxis,
+  filterXAxis,
   renderGanttItem,
   subXAxisLabelFormatter,
 } from "./helpers";
 
-// [9, "2010-02-1", "2013-01-1", 100, "Amira", "complete"]
-
+export const empData = [
+  [3, "2011-11-1", "2019-05-1", 90, "Khaled", "in-progress"],
+  [4, "2019-11-1", "2022-01-1", 60, "Karam", "in-progress"],
+  [6, "2015-01-1", "2019-11-1", 80, "Islam", "in-progress"],
+  [8, "2010-01-1", "2013-01-1", 90, "Lamyaa", "in-progress"],
+  [10, "2010-05-1", "2013-08-1", 60, "Ola", "in-progress"],
+  [0, "2017-04-1", "2020-06-07", 100, "Ali", "complete"],
+  [12, "2017-01-13", "2019-10-02", 0, "Amir", "not-started"],
+  [13, "2016-11-1", "2022-01-1", 0, "Mahmoud", "not-started"],
+  [5, "2011-11-1", "2013-01-1", 0, "Safwat", "not-started"],
+  [7, "2013-01-1", "2014-11-1", 40, "Kareem", "delayed"],
+  [2, "2017-05-1", "2017-12-01", 50, "Mostafa", "delayed"],
+  [1, "2011-02-1", "2013-09-19", 20, "Omar", "delayed"],
+  [11, "2010-12-1", "2013-12-1", 30, "Tarek", "delayed"],
+  [14, "2016-10-23", "2018-04-17", 30, "Mudather", "delayed"],
+];
+// console.log("🚀 ~ empData", empData[empData.length - 1]);
+filterXAxis("delayed", empData);
 type EChartsOption = echarts.EChartsOption;
 
 /* DOM elements */
@@ -298,7 +315,7 @@ const option: EChartsOption = {
       name: "not-started",
       type: "custom",
       // select: false,
-      data: data.notStarted,
+      data: filterXAxis("not-started", empData),
       encode: {
         x: [1, 2],
         y: 0, // reference of index
@@ -310,7 +327,7 @@ const option: EChartsOption = {
     {
       name: "complete",
       type: "custom",
-      data: data.complete,
+      data: filterXAxis("complete", empData),
       encode: {
         x: [1, 2],
         y: 0, // reference of index
@@ -322,7 +339,7 @@ const option: EChartsOption = {
     {
       name: "in-progress",
       type: "custom",
-      data: data.inProgress,
+      data: filterXAxis("in-progress", empData),
       encode: {
         x: [1, 2],
         y: 0, // reference of index
@@ -334,7 +351,7 @@ const option: EChartsOption = {
     {
       name: "delayed",
       type: "custom",
-      data: data.delayed,
+      data: filterXAxis("delayed", empData),
       encode: {
         x: [1, 2],
         y: 0, // reference of index
@@ -432,21 +449,16 @@ window.addEventListener("click", (e: Event) => {
     const elementId = target.closest("div")?.getAttribute("id");
     const legend = target.closest("div")?.querySelector(".circle");
 
-    legend?.classList.toggle("circle--toggled");
-
     if (elementId === "completed") {
       chart.dispatchAction({ type: "legendToggleSelect", name: "complete" });
       legend?.classList.toggle("circle--completed");
+
       // chart.setOption({
       //   ...option,
       //   yAxis: {
-      //     data: extractNames([
-      //       ...data.delayed,
-      //       ...data.inProgress,
-      //       ...data.notStarted,
-      //     ]),
+      //     data: [...data.inProgress, ...data.delayed, ...data.notStarted],
       //     min: -1,
-      //     max: 15 - data.complete.length,
+      //     max: [...data.inProgress, ...data.delayed, ...data.notStarted].length,
       //   },
       //   // series:
       // });

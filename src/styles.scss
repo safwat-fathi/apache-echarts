@@ -94,7 +94,9 @@ $selected: #888888;
     height: 20px;
     display: block;
     border-radius: 50%;
+    background-color: $selected;
     margin: 5px;
+    transition: all 0.3s;
 
     &::after {
       content: "";
@@ -122,8 +124,8 @@ $selected: #888888;
       background-color: $completed;
     }
 
-    &--toggled {
-      background-color: $selected;
-    }
+    // &--toggled {
+    //   background-color: $selected;
+    // }
   }
 }

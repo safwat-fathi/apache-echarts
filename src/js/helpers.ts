@@ -1,6 +1,6 @@
 import * as echarts from "echarts";
-import { chartWidth, textPositionConstant } from ".";
-import data from "../../data.json";
+import { chartWidth, textPositionConstant, empData } from ".";
+// import data from "../../data.json";
 // import { chart } from ".";
 
 type RenderItemParams = echarts.CustomSeriesRenderItemParams;
@@ -16,6 +16,16 @@ export const filterYAxis = (
   // let filtered = yDataArr[0].data.filter((el: any) => el.type !== type);
   let filtered = data.filter((el: any) => el.type !== type);
   // console.log("filtered:", filtered);
+
+  return filtered;
+};
+
+export const filterXAxis = (
+  type: "not-started" | "delayed" | "complete" | "in-progress",
+  data: any[]
+): any[] => {
+  let filtered = data.filter((el: any[]) => el[el.length - 1] === type);
+  console.log("filtered:", filtered);
 
   return filtered;
 };
@@ -69,7 +79,8 @@ export const subXAxisLabelFormatter = (
   const month = date.toLocaleDateString("en-US", { month: "numeric" });
 
   if (type === "quarter") return `Q${Math.ceil(+month / 3)}`;
-  if (type === "semester") return `H${Math.ceil(+month / 3) < 3 ? 1 : 2}`;
+  if (type === "semester")
+    return `Semester${Math.ceil(+month / 3) < 3 ? 1 : 2}`;
 
   return date.toLocaleDateString("en-US", { month: "short" });
 };
