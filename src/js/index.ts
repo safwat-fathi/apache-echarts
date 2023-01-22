@@ -1,10 +1,10 @@
 /*
 	TODO:	Main tasks
 	// - remove repeated years
+	- toggle legend color if clicked
 	- colors on hover on bars (maybe add border on bars if hovered)
 	- centering images
-	- toggle legend color if clicked
-	- update chart on series non-visible 
+	- update chart y axis on series toggled from legend 
 	- meet UI
 		- clip path to images as circle
 
@@ -14,9 +14,17 @@
 import "../styles.scss";
 import data from "../../data.json";
 import * as echarts from "echarts";
-import { renderGanttItem, subXAxisLabelFormatter } from "./helpers";
+import {
+  extractNames,
+  filterYAxis,
+  renderGanttItem,
+  subXAxisLabelFormatter,
+} from "./helpers";
+
+// [9, "2010-02-1", "2013-01-1", 100, "Amira", "complete"]
 
 type EChartsOption = echarts.EChartsOption;
+
 /* DOM elements */
 
 // chart container
@@ -45,49 +53,19 @@ chart &&
 // const FONT_SIZE = 30;
 const MIN = "2009";
 const MAX = "2023";
+// console.log(
+//   extractNames([
+//     ...data.complete,
+//     ...data.delayed,
+//     ...data.inProgress,
+//     ...data.notStarted,
+//   ]).length
+// );
 
-const filterYAxis = (
-  type: "not-started" | "delayed" | "complete" | "in-progress"
-): any[] => {
-  let yData: echarts.EChartsCoreOption = chart.getOption();
-  let yDataArr = <any[]>yData.yAxis;
-  // console.log(yDataArr[0].data);
-  let filtered = yDataArr[0].data.filter((el: any) => el.type !== type);
-  // console.log(filtered);
+// store.setState("min", "2009");
+// console.log("store.getState('min')", store.getState());
 
-  return filtered;
-};
-
-const extractNames = (empData?: any[]) => {
-  let allData = empData || [
-    ...data.complete,
-    ...data.delayed,
-    ...data.inProgress,
-    ...data.notStarted,
-  ];
-
-  allData = allData.sort((a: any, b: any) => {
-    return a[0] < b[0] ? -1 : 1;
-  });
-
-  let names: any[] = [];
-
-  for (let i = 0; i < allData.length; i++) {
-    // names = [...names, allData[i][allData[i].length - 1]];
-    names = [
-      ...names,
-      {
-        type: allData[i][allData[i].length - 1],
-        value: allData[i][allData[i].length - 2],
-      },
-    ];
-  }
-  // console.log(names);
-
-  return names;
-};
-
-// const filter = ()
+// const chartData: Record<string, (string | number)[][]> = data;
 
 export let textPositionConstant = 6;
 let xAxisZoomStart = 40;
@@ -285,12 +263,23 @@ const option: EChartsOption = {
     type: "category",
     // boundaryGap: ["1%", "1%"],
     boundaryGap: true,
-    min: 0,
-    max: extractNames().length,
+    min: -1,
+    max:
+      extractNames([
+        ...data.complete,
+        ...data.delayed,
+        ...data.inProgress,
+        ...data.notStarted,
+      ]).length + 1,
     axisTick: { show: false },
     splitLine: { show: false },
     axisLine: { show: false },
-    data: extractNames(),
+    data: extractNames([
+      ...data.complete,
+      ...data.delayed,
+      ...data.inProgress,
+      ...data.notStarted,
+    ]),
     axisLabel: {
       show: true,
       fontWeight: "bold",
@@ -441,61 +430,45 @@ window.addEventListener("click", (e: Event) => {
     target.closest("div#in-progress")
   ) {
     const elementId = target.closest("div")?.getAttribute("id");
+    const legend = target.closest("div")?.querySelector(".circle");
+
+    legend?.classList.toggle("circle--toggled");
 
     if (elementId === "completed") {
       chart.dispatchAction({ type: "legendToggleSelect", name: "complete" });
-      chart.setOption({
-        ...option,
-        yAxis: {
-          data: filterYAxis("complete"),
-          max: filterYAxis("complete").length,
-        },
-      });
+      legend?.classList.toggle("circle--completed");
+      // chart.setOption({
+      //   ...option,
+      //   yAxis: {
+      //     data: extractNames([
+      //       ...data.delayed,
+      //       ...data.inProgress,
+      //       ...data.notStarted,
+      //     ]),
+      //     min: -1,
+      //     max: 15 - data.complete.length,
+      //   },
+      //   // series:
+      // });
+      // filterYAxis("complete");
     }
 
     if (elementId === "delayed") {
       chart.dispatchAction({ type: "legendToggleSelect", name: "delayed" });
-      chart.setOption({
-        ...option,
-        yAxis: {
-          data: filterYAxis("delayed"),
-          max: filterYAxis("delayed").length,
-        },
-      });
+      legend?.classList.toggle("circle--delayed");
+      // filterYAxis("delayed");
     }
 
     if (elementId === "not-started") {
       chart.dispatchAction({ type: "legendToggleSelect", name: "not-started" });
-      chart.setOption({
-        ...option,
-        yAxis: {
-          // data: filterYAxis("not-started"),
-          data: extractNames(filterYAxis("not-started")),
-          max: filterYAxis("not-started").length,
-        },
-      });
+      legend?.classList.toggle("circle--not-started");
+      // filterYAxis("not-started");
     }
 
     if (elementId === "in-progress") {
       chart.dispatchAction({ type: "legendToggleSelect", name: "in-progress" });
-      chart.setOption({
-        ...option,
-        yAxis: {
-          data: [
-            [0, "2017-04-1", "2020-06-07", 100, "Ali", "complete"],
-            [9, "2010-02-1", "2013-01-1", 100, "Amira", "complete"],
-            [12, "2017-01-13", "2019-10-02", 0, "Amir", "not-started"],
-            [13, "2016-11-1", "2022-01-1", 0, "Mahmoud", "not-started"],
-            [5, "2011-11-1", "2013-01-1", 0, "Safwat", "not-started"],
-            [7, "2013-01-1", "2014-11-1", 40, "Kareem", "delayed"],
-            [2, "2017-05-1", "2017-12-01", 50, "Mostafa", "delayed"],
-            [1, "2011-02-1", "2013-09-19", 20, "Omar", "delayed"],
-            [11, "2010-12-1", "2013-12-1", 30, "Tarek", "delayed"],
-            [14, "2016-10-23", "2018-04-17", 30, "Mudather", "delayed"],
-          ].sort((a: any, b: any) => (a[0] < b[0] ? -1 : 1)),
-          max: filterYAxis("in-progress").length,
-        },
-      });
+      legend?.classList.toggle("circle--in-progress");
+      // filterYAxis("in-progress");
     }
   }
 });

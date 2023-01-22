@@ -1,9 +1,48 @@
 import * as echarts from "echarts";
 import { chartWidth, textPositionConstant } from ".";
+import data from "../../data.json";
+// import { chart } from ".";
 
 type RenderItemParams = echarts.CustomSeriesRenderItemParams;
 type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
 type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
+
+export const filterYAxis = (
+  type: "not-started" | "delayed" | "complete" | "in-progress",
+  data: any[]
+): any[] => {
+  // let yData: echarts.EChartsCoreOption = chart.getOption();
+  // let yDataArr = <any[]>yData.yAxis;
+  // let filtered = yDataArr[0].data.filter((el: any) => el.type !== type);
+  let filtered = data.filter((el: any) => el.type !== type);
+  // console.log("filtered:", filtered);
+
+  return filtered;
+};
+
+export const extractNames = (empData: any[]): any[] => {
+  let names: any[] = [];
+
+  if (empData) {
+    empData.sort((a: any, b: any) => {
+      return a[0] < b[0] ? -1 : 1;
+    });
+
+    for (let i = 0; i < empData.length; i++) {
+      // names = [...names, allData[i][allData[i].length - 1]];
+      names = [
+        ...names,
+        {
+          type: empData[i][empData[i].length - 1],
+          value: empData[i][empData[i].length - 2],
+        },
+      ];
+    }
+  }
+  // console.log("new names:", names);
+
+  return names;
+};
 
 const fillColor = (percent: number) => {
   const COLORS = {
