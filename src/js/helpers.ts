@@ -1,5 +1,5 @@
 import * as echarts from "echarts";
-import { chartWidth, textPositionConstant } from ".";
+import { chartWidth, yAxisZoomEnd, yAxisZoomStart } from ".";
 import { empData } from "../../data";
 // import data from "../../data.json";
 // import { chart } from ".";
@@ -125,7 +125,13 @@ export const renderGanttItem = (
     chartWidth - x > 100 + mainTextWidth * 2 ? `${percentage}%` : "";
 
   const imagePosition = x + barWidth + 20;
-  const textPosition = y + height / 2 - textPositionConstant;
+  // const textPosition = y + height / 2 - textPositionConstant;
+  // let empNameHeight = echarts.format.getTextRect(`${employeeName}`).height;
+  // const textPosition = y + height * textPositionConstant;
+  // const textPosition = start[1] - height / 4;
+  const textPosition = y;
+  // console.log("🚀 ~ y + height", y + height);
+  // console.log("🚀 ~ empNameHeight", empNameHeight / 2);
 
   const rectShape = echarts.graphic.clipRectByRect(
     {
@@ -188,7 +194,27 @@ export const renderGanttItem = (
         },
         textConfig: {
           position: "insideRight",
-          // distance: 15,
+        },
+      },
+      {
+        type: "rect",
+        ignore: !rectShape,
+        shape: { ...rectShape, r: 6 },
+        style: {
+          fill: "transparent",
+          stroke: "transparent",
+        },
+        textContent: {
+          type: "text",
+          style: {
+            text: String(employeeName),
+            fontWeight: "bold",
+            fill: "#000",
+          },
+        },
+        textConfig: {
+          position: "right",
+          distance: 90 / ((100 + yAxisZoomEnd - yAxisZoomStart) / 100),
         },
       },
       {
@@ -223,19 +249,6 @@ export const renderGanttItem = (
           y,
           width: height * 0.9,
           height: height * 0.9,
-        },
-      },
-      {
-        type: "text",
-        style: {
-          text: String(employeeName),
-          x: imagePosition + height + 10,
-          y: textPosition,
-          fontWeight: "bold",
-          // fontSize:
-          //   yAxisZoomEnd - yAxisZoomStart <= 51
-          //     ? FONT_SIZE - FONT_SIZE * ((yAxisZoomEnd - yAxisZoomStart) / 100)
-          //     : 13,
         },
       },
     ],

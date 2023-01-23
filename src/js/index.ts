@@ -49,33 +49,19 @@ chart &&
   }).observe(chartDom);
 
 // globals
-// const HEIGHT_RATIO = 0.5;
-// const FONT_SIZE = 30;
 const MIN = "2009";
 const MAX = "2023";
-// console.log(
-//   extractNames([
-//     ...data.complete,
-//     ...data.delayed,
-//     ...data.inProgress,
-//     ...data.notStarted,
-//   ]).length
-// );
 
-// store.setState("min", "2009");
-// console.log("store.getState('min')", store.getState());
-
-// const chartData: Record<string, (string | number)[][]> = data;
-
-export let textPositionConstant = 6;
-let xAxisZoomStart = 40;
-let xAxisZoomEnd = 92.9;
-let yAxisZoomStart = 0;
-let yAxisZoomEnd = 100;
+export let xAxisZoomStart = 40;
+export let xAxisZoomEnd = 92.9;
+export let yAxisZoomStart = 0;
+export let yAxisZoomEnd = 30;
 
 let subAxisType: "quarter" | "month" | "semester" = "quarter";
 
 chart.on("dataZoom", (e: any) => {
+  // console.log("event:", e);
+
   if (e.dataZoomId === "scrollY") {
     yAxisZoomStart = e.start;
     yAxisZoomEnd = e.end;
@@ -86,20 +72,7 @@ chart.on("dataZoom", (e: any) => {
     xAxisZoomEnd = e.end;
   }
 
-  if (yAxisZoomEnd - yAxisZoomStart <= 30) {
-    textPositionConstant = 9;
-  }
-
-  if (
-    yAxisZoomEnd - yAxisZoomStart > 30 ||
-    yAxisZoomEnd - yAxisZoomStart <= 50
-  ) {
-    textPositionConstant = 8;
-  }
-
-  if (yAxisZoomEnd - yAxisZoomStart > 60) {
-    textPositionConstant = 6;
-  }
+  // console.log("percent", yAxisZoomEnd - yAxisZoomStart);
 });
 
 const option: EChartsOption = {
