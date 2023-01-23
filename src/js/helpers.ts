@@ -1,5 +1,6 @@
 import * as echarts from "echarts";
-import { chartWidth, textPositionConstant, empData } from ".";
+import { chartWidth, textPositionConstant } from ".";
+import { empData } from "../../data";
 // import data from "../../data.json";
 // import { chart } from ".";
 
@@ -8,43 +9,52 @@ type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
 type RenderItemReturn = echarts.CustomSeriesRenderItemReturn;
 
 export const filterYAxis = (
-  type: "not-started" | "delayed" | "complete" | "in-progress",
+  // type: "all" | "not-started" | "delayed" | "completed" | "in-progress",
   data: any[]
 ): any[] => {
-  // let yData: echarts.EChartsCoreOption = chart.getOption();
-  // let yDataArr = <any[]>yData.yAxis;
-  // let filtered = yDataArr[0].data.filter((el: any) => el.type !== type);
-  let filtered = data.filter((el: any) => el.type !== type);
-  // console.log("filtered:", filtered);
+  let names: any[] = [];
+  // let dataSorted = data.sort((a: any, b: any) => {
+  //   return a[0] < b[0] ? -1 : 1;
+  // });
 
-  return filtered;
+  for (let i in data) {
+    names = [...names, [data[i][0], data[i][4]]];
+  }
+
+  // console.log("🚀 ~ names", names);
+
+  return names;
 };
 
 export const filterXAxis = (
-  type: "not-started" | "delayed" | "complete" | "in-progress",
+  type: "all" | "not-started" | "delayed" | "completed" | "in-progress",
   data: any[]
 ): any[] => {
-  let filtered = data.filter((el: any[]) => el[el.length - 1] === type);
-  console.log("filtered:", filtered);
+  if (type !== "all") {
+    let filtered = data.filter((el: any[]) => el[el.length - 1] === type);
+    // console.log("filtered:", filtered);
 
-  return filtered;
+    return filtered;
+  }
+
+  return data;
 };
 
-export const extractNames = (empData: any[]): any[] => {
+export const extractNames = (data: any[]): any[] => {
   let names: any[] = [];
 
-  if (empData) {
-    empData.sort((a: any, b: any) => {
+  if (data) {
+    data.sort((a: any, b: any) => {
       return a[0] < b[0] ? -1 : 1;
     });
 
-    for (let i = 0; i < empData.length; i++) {
+    for (let i = 0; i < data.length; i++) {
       // names = [...names, allData[i][allData[i].length - 1]];
       names = [
         ...names,
         {
-          type: empData[i][empData[i].length - 1],
-          value: empData[i][empData[i].length - 2],
+          type: data[i][data[i].length - 1],
+          value: data[i][data[i].length - 2],
         },
       ];
     }

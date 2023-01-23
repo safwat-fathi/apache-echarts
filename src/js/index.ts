@@ -21,25 +21,8 @@ import {
   renderGanttItem,
   subXAxisLabelFormatter,
 } from "./helpers";
+import { empData } from "../../data";
 
-export const empData = [
-  [3, "2011-11-1", "2019-05-1", 90, "Khaled", "in-progress"],
-  [4, "2019-11-1", "2022-01-1", 60, "Karam", "in-progress"],
-  [6, "2015-01-1", "2019-11-1", 80, "Islam", "in-progress"],
-  [8, "2010-01-1", "2013-01-1", 90, "Lamyaa", "in-progress"],
-  [10, "2010-05-1", "2013-08-1", 60, "Ola", "in-progress"],
-  [0, "2017-04-1", "2020-06-07", 100, "Ali", "complete"],
-  [12, "2017-01-13", "2019-10-02", 0, "Amir", "not-started"],
-  [13, "2016-11-1", "2022-01-1", 0, "Mahmoud", "not-started"],
-  [5, "2011-11-1", "2013-01-1", 0, "Safwat", "not-started"],
-  [7, "2013-01-1", "2014-11-1", 40, "Kareem", "delayed"],
-  [2, "2017-05-1", "2017-12-01", 50, "Mostafa", "delayed"],
-  [1, "2011-02-1", "2013-09-19", 20, "Omar", "delayed"],
-  [11, "2010-12-1", "2013-12-1", 30, "Tarek", "delayed"],
-  [14, "2016-10-23", "2018-04-17", 30, "Mudather", "delayed"],
-];
-// console.log("🚀 ~ empData", empData[empData.length - 1]);
-filterXAxis("delayed", empData);
 type EChartsOption = echarts.EChartsOption;
 
 /* DOM elements */
@@ -281,13 +264,7 @@ const option: EChartsOption = {
     // boundaryGap: ["1%", "1%"],
     boundaryGap: true,
     min: -1,
-    max:
-      extractNames([
-        ...data.complete,
-        ...data.delayed,
-        ...data.inProgress,
-        ...data.notStarted,
-      ]).length + 1,
+    max: empData.length,
     axisTick: { show: false },
     splitLine: { show: false },
     axisLine: { show: false },
@@ -325,9 +302,9 @@ const option: EChartsOption = {
       clip: true,
     },
     {
-      name: "complete",
+      name: "completed",
       type: "custom",
-      data: filterXAxis("complete", empData),
+      data: filterXAxis("completed", empData),
       encode: {
         x: [1, 2],
         y: 0, // reference of index
@@ -490,6 +467,7 @@ window.addEventListener("click", (e: Event) => {
   el => {
     if (el) {
       el.addEventListener("mouseenter", _ => {
+        console.log(el.id);
         chart.dispatchAction({ type: "highlight", seriesName: el.id });
       });
 
