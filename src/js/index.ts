@@ -45,12 +45,17 @@ export const zoomData = {
     minSpan: 12.5,
     maxSpan: 60,
   },
-  yAxis: { start: 0, end: 30, minSpan: 12.5, maxSpan: 60 },
+  yAxis: {
+    start: 0,
+    end: 30,
+    minSpan: 12.5,
+    maxSpan: 60,
+  },
 };
 console.log("🚀 ~ zoomData", zoomData);
 let subAxisType: "quarter" | "month" | "semester" = "quarter";
 
-chart.on("dataZoom", (e: any) => dataZoomHandler(e));
+chart.on("dataZoom", dataZoomHandler);
 
 // chart.on("dataZoom", (e: any) => {
 //   if (e.dataZoomId === "scrollY") {

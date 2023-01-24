@@ -67,12 +67,17 @@ export const extractNames = (data: any[]): any[] => {
 export const dataZoomHandler = (e: any) => {
   console.log("event:", e);
   // console.log("zoomData", zoomData);
-  if (!e.dataZoomId) return;
+  if (!e.dataZoomId && e.batch[0].dataZoomId === "insideY") {
+    zoomData.yAxis.start = e.batch[0].start;
+    zoomData.yAxis.end = e.batch[0].end;
 
-  zoomData.xAxis.start = e.start;
-  zoomData.xAxis.end = e.end;
-  zoomData.yAxis.start = e.start;
-  zoomData.yAxis.end = e.end;
+    return;
+  }
+
+  // zoomData.xAxis.start = e.start;
+  // zoomData.xAxis.end = e.end;
+  // zoomData.yAxis.start = e.start;
+  // zoomData.yAxis.end = e.end;
 
   if (e.dataZoomId === "scrollY") {
     zoomData.yAxis.start = e.start;
