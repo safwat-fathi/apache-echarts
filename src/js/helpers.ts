@@ -67,6 +67,7 @@ export const extractNames = (data: any[]): any[] => {
 export const dataZoomHandler = (e: any) => {
   console.log("event:", e);
   // console.log("zoomData", zoomData);
+  if (!e.dataZoomId) return;
 
   zoomData.xAxis.start = e.start;
   zoomData.xAxis.end = e.end;
