@@ -44,13 +44,13 @@ export const zoomData = {
   xAxis: {
     start: 40,
     end: 92.9,
-    minSpan: 12.5,
-    maxSpan: 60,
+    minSpan: 35,
+    maxSpan: 80,
   },
   yAxis: {
     start: 0,
     end: 30,
-    minSpan: 12.5,
+    minSpan: 40,
     maxSpan: 60,
   },
 };
