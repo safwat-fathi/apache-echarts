@@ -1,5 +1,5 @@
 import * as echarts from "echarts";
-import { chartWidth, zoomData } from ".";
+import { chartWidth, zoomData, subAxisType } from ".";
 import { empData } from "../../data";
 import { COLORS } from "./constants";
 // import data from "../../data.json";
@@ -64,8 +64,32 @@ export const extractNames = (data: any[]): any[] => {
   return names;
 };
 
+export const xAxisLabelFormatter = (value: any) => {
+  const year = new Date(value).toLocaleDateString("en-US", {
+    year: "numeric",
+  });
+
+  const month = new Date(value).toLocaleDateString("en-US", {
+    month: "numeric",
+  });
+  const quarter = Math.ceil(+month / 3);
+  const semester = Math.ceil(+month / 2);
+
+  if (subAxisType === "quarter") {
+    return quarter === 1 ? year : "";
+  }
+
+  if (subAxisType === "month") {
+    return +month === 1 ? year : "";
+  }
+
+  return +semester === 1 ? year : "";
+};
+
+export const tooltipFormatter = (content: string) => content;
+
 export const dataZoomHandler = (e: any) => {
-  console.log("event:", e);
+  // console.log("event:", e);
   // console.log("zoomData", zoomData);
   if (!e.dataZoomId && e.batch[0].dataZoomId === "insideY") {
     zoomData.yAxis.start = e.batch[0].start;
@@ -73,11 +97,6 @@ export const dataZoomHandler = (e: any) => {
 
     return;
   }
-
-  // zoomData.xAxis.start = e.start;
-  // zoomData.xAxis.end = e.end;
-  // zoomData.yAxis.start = e.start;
-  // zoomData.yAxis.end = e.end;
 
   if (e.dataZoomId === "scrollY") {
     zoomData.yAxis.start = e.start;

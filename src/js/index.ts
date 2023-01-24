@@ -20,7 +20,9 @@ import {
   filterXAxis,
   renderGanttItem,
   subXAxisLabelFormatter,
+  xAxisLabelFormatter,
   dataZoomHandler,
+  tooltipFormatter,
 } from "./helpers";
 import { domElements, MIN, MAX } from "./constants";
 import { empData } from "../../data";
@@ -53,21 +55,9 @@ export const zoomData = {
   },
 };
 console.log("🚀 ~ zoomData", zoomData);
-let subAxisType: "quarter" | "month" | "semester" = "quarter";
+export let subAxisType: "quarter" | "month" | "semester" = "quarter";
 
 chart.on("dataZoom", dataZoomHandler);
-
-// chart.on("dataZoom", (e: any) => {
-//   if (e.dataZoomId === "scrollY") {
-//     zoomData.yAxis.start = e.start;
-//     zoomData.yAxis.end = e.end;
-//   }
-
-//   if (e.dataZoomId === "scrollX") {
-//     zoomData.xAxis.start = e.start;
-//     zoomData.xAxis.end = e.end;
-//   }
-// });
 
 const option: EChartsOption = {
   animation: true,
@@ -91,7 +81,7 @@ const option: EChartsOption = {
         opacity: "0.3",
       },
     },
-    position: (point: number[]) => [point[0], point[1] + 20],
+    position: (point: number[]) => [point[0], point[1] + 20], // position relative to pointer [x, y + 20px]
     formatter: function (params: any) {
       const data = params[0].data;
 
@@ -113,7 +103,7 @@ const option: EChartsOption = {
       id: "scrollY",
       yAxisIndex: 0,
       width: 10, // width of slider
-      bottom: 35, //
+      bottom: 30, //
       handleSize: "300%",
       start: zoomData.yAxis.start,
       end: zoomData.yAxis.end,
@@ -140,7 +130,7 @@ const option: EChartsOption = {
       type: "slider",
       id: "scrollX",
       xAxisIndex: [0, 1],
-      width: 1000 - 30,
+      width: "98.4%",
       height: 10,
       right: 30,
       bottom: 20,
@@ -171,27 +161,28 @@ const option: EChartsOption = {
         color: "#fff",
         fontSize: 18,
         showMaxLabel: true,
-        formatter: (value: any) => {
-          const year = new Date(value).toLocaleDateString("en-US", {
-            year: "numeric",
-          });
+        // formatter: (value: any) => {
+        //   const year = new Date(value).toLocaleDateString("en-US", {
+        //     year: "numeric",
+        //   });
 
-          const month = new Date(value).toLocaleDateString("en-US", {
-            month: "numeric",
-          });
-          const quarter = Math.ceil(+month / 3);
-          const semester = Math.ceil(+month / 2);
+        //   const month = new Date(value).toLocaleDateString("en-US", {
+        //     month: "numeric",
+        //   });
+        //   const quarter = Math.ceil(+month / 3);
+        //   const semester = Math.ceil(+month / 2);
 
-          if (subAxisType === "quarter") {
-            return quarter === 1 ? year : "";
-          }
+        //   if (subAxisType === "quarter") {
+        //     return quarter === 1 ? year : "";
+        //   }
 
-          if (subAxisType === "month") {
-            return +month === 1 ? year : "";
-          }
+        //   if (subAxisType === "month") {
+        //     return +month === 1 ? year : "";
+        //   }
 
-          return +semester === 1 ? year : "";
-        },
+        //   return +semester === 1 ? year : "";
+        // },
+        formatter: xAxisLabelFormatter,
       },
     },
     {
@@ -319,6 +310,7 @@ const option: EChartsOption = {
 };
 
 chart.setOption(option);
+// console.log(chart.getOption());
 
 // listen to buttons events
 window.addEventListener("click", (e: Event) => {
