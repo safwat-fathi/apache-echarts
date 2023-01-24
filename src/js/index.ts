@@ -54,7 +54,7 @@ export const zoomData = {
     maxSpan: 60,
   },
 };
-console.log("🚀 ~ zoomData", zoomData);
+// console.log("🚀 ~ zoomData", zoomData);
 export let subAxisType: "quarter" | "month" | "semester" = "quarter";
 
 chart.on("dataZoom", dataZoomHandler);
@@ -70,7 +70,6 @@ const option: EChartsOption = {
     // 	selectorLabel: true
     // }
   },
-  // @ts-ignore
   tooltip: {
     trigger: "axis",
     axisPointer: {
@@ -78,7 +77,7 @@ const option: EChartsOption = {
       type: "shadow",
       shadowStyle: {
         color: "#2b64bb7c",
-        opacity: "0.3",
+        opacity: 0.3,
       },
     },
     position: (point: number[]) => [point[0], point[1] + 20], // position relative to pointer [x, y + 20px]
@@ -161,27 +160,6 @@ const option: EChartsOption = {
         color: "#fff",
         fontSize: 18,
         showMaxLabel: true,
-        // formatter: (value: any) => {
-        //   const year = new Date(value).toLocaleDateString("en-US", {
-        //     year: "numeric",
-        //   });
-
-        //   const month = new Date(value).toLocaleDateString("en-US", {
-        //     month: "numeric",
-        //   });
-        //   const quarter = Math.ceil(+month / 3);
-        //   const semester = Math.ceil(+month / 2);
-
-        //   if (subAxisType === "quarter") {
-        //     return quarter === 1 ? year : "";
-        //   }
-
-        //   if (subAxisType === "month") {
-        //     return +month === 1 ? year : "";
-        //   }
-
-        //   return +semester === 1 ? year : "";
-        // },
         formatter: xAxisLabelFormatter,
       },
     },
@@ -230,14 +208,6 @@ const option: EChartsOption = {
     axisLabel: {
       show: true,
       fontWeight: "bold",
-      // color: "#fff",
-      // padding: 2,
-      // backgroundColor: "#005371",
-      // backgroundColor: {
-      //   image:
-      //     '"https://pbs.twimg.com/profile_images/1329949157486854150/2vhx3rm9_400x400.jpg"',
-      // },
-      // formatter: (value: any) => `${value}`,
     },
   },
   series: [
@@ -259,7 +229,7 @@ const option: EChartsOption = {
       type: "custom",
       data: filterXAxis("completed", empData),
       encode: {
-        x: [1, 2],
+        x: [1, 2], // reference of [date start, date end]
         y: 0, // reference of index
       },
       xAxisIndex: 0,
@@ -271,7 +241,7 @@ const option: EChartsOption = {
       type: "custom",
       data: filterXAxis("in-progress", empData),
       encode: {
-        x: [1, 2],
+        x: [1, 2], // reference of [date start, date end]
         y: 0, // reference of index
       },
       xAxisIndex: 0,
@@ -283,7 +253,7 @@ const option: EChartsOption = {
       type: "custom",
       data: filterXAxis("delayed", empData),
       encode: {
-        x: [1, 2],
+        x: [1, 2], // reference of [date start, date end]
         y: 0, // reference of index
       },
       xAxisIndex: 0,
