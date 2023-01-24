@@ -68,6 +68,20 @@ const MAX = "2023";
 // const chartData: Record<string, (string | number)[][]> = data;
 
 export let textPositionConstant = 6;
+export const zoomData = {
+  xAxis: {
+    start: 40,
+    end: 92.9,
+    minSpan: 35,
+    maxSpan: 80,
+  },
+  yAxis: {
+    start: 0,
+    end: 60,
+    minSpan: 12.5,
+    maxSpan: 60,
+  },
+};
 let xAxisZoomStart = 40;
 let xAxisZoomEnd = 92.9;
 let yAxisZoomStart = 0;
@@ -77,13 +91,17 @@ let subAxisType: "quarter" | "month" | "semester" = "quarter";
 
 chart.on("dataZoom", (e: any) => {
   if (e.dataZoomId === "scrollY") {
-    yAxisZoomStart = e.start;
-    yAxisZoomEnd = e.end;
+    // yAxisZoomStart = e.start;
+    // yAxisZoomEnd = e.end;
+    zoomData.yAxis.start = e.start;
+    zoomData.yAxis.end = e.end;
   }
 
   if (e.dataZoomId === "scrollX") {
-    xAxisZoomStart = e.start;
-    xAxisZoomEnd = e.end;
+    // xAxisZoomStart = e.start;
+    // xAxisZoomEnd = e.end;
+    zoomData.xAxis.start = e.start;
+    zoomData.xAxis.end = e.end;
   }
 
   if (yAxisZoomEnd - yAxisZoomStart <= 30) {
@@ -151,11 +169,11 @@ const option: EChartsOption = {
       // top: 85,
       bottom: 35,
       handleSize: "300%",
-      start: yAxisZoomStart,
-      end: yAxisZoomEnd,
+      start: zoomData.yAxis.start,
+      end: zoomData.yAxis.end,
       showDetail: false,
-      minSpan: 35,
-      maxSpan: 80,
+      minSpan: zoomData.yAxis.minSpan,
+      maxSpan: zoomData.yAxis.maxSpan,
       filterMode: "none",
     },
     // Y axis scroll inside grid
@@ -164,8 +182,8 @@ const option: EChartsOption = {
       id: "insideY",
       yAxisIndex: 0,
       top: 100,
-      start: yAxisZoomStart,
-      end: yAxisZoomEnd,
+      start: zoomData.xAxis.start,
+      end: zoomData.xAxis.end,
       zoomOnMouseWheel: false,
       moveOnMouseMove: true,
       moveOnMouseWheel: true,
@@ -181,11 +199,11 @@ const option: EChartsOption = {
       right: 30,
       bottom: 20,
       handleSize: "300%",
-      start: xAxisZoomStart,
-      end: xAxisZoomEnd,
+      start: zoomData.xAxis.start,
+      end: zoomData.xAxis.end,
       showDetail: false,
-      minSpan: 12.5,
-      maxSpan: 60,
+      minSpan: zoomData.xAxis.minSpan,
+      maxSpan: zoomData.xAxis.maxSpan,
       filterMode: "none",
     },
   ],
@@ -370,12 +388,12 @@ window.addEventListener("click", (e: Event) => {
     const dataZoom: any = option.dataZoom;
 
     // keep data zoom values across changes
-    dataZoom[0].start = yAxisZoomStart;
-    dataZoom[0].end = yAxisZoomEnd;
-    dataZoom[1].start = yAxisZoomStart;
-    dataZoom[1].end = yAxisZoomEnd;
-    dataZoom[2].start = xAxisZoomStart;
-    dataZoom[2].end = xAxisZoomEnd;
+    dataZoom[0].start = zoomData.yAxis.start;
+    dataZoom[0].end = zoomData.yAxis.end;
+    dataZoom[1].start = zoomData.yAxis.start;
+    dataZoom[1].end = zoomData.yAxis.end;
+    dataZoom[2].start = zoomData.xAxis.start;
+    dataZoom[2].end = zoomData.xAxis.end;
 
     if (e.target === semesterBtn) {
       semesterBtn?.classList.add("active");
