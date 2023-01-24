@@ -66,24 +66,24 @@ export const extractNames = (data: any[]): any[] => {
 
 export const dataZoomHandler = (e: any) => {
   console.log("event:", e);
-  console.log("zoomData", zoomData);
+  // console.log("zoomData", zoomData);
 
-  zoomData.xAxisZoomStart = e.start;
-  zoomData.xAxisZoomEnd = e.end;
-  zoomData.yAxisZoomStart = e.start;
-  zoomData.yAxisZoomEnd = e.end;
+  zoomData.xAxis.start = e.start;
+  zoomData.xAxis.end = e.end;
+  zoomData.yAxis.start = e.start;
+  zoomData.yAxis.end = e.end;
 
   if (e.dataZoomId === "scrollY") {
-    zoomData.yAxisZoomStart = e.start;
-    zoomData.yAxisZoomEnd = e.end;
+    zoomData.yAxis.start = e.start;
+    zoomData.yAxis.end = e.end;
   }
 
   if (e.dataZoomId === "scrollX") {
-    zoomData.xAxisZoomStart = e.start;
-    zoomData.xAxisZoomEnd = e.end;
+    zoomData.xAxis.start = e.start;
+    zoomData.xAxis.end = e.end;
   }
 
-  console.log("zoomData", zoomData);
+  // console.log("zoomData", zoomData);
 };
 
 const fillColor = (
@@ -231,8 +231,7 @@ export const renderGanttItem = (
         textConfig: {
           position: "right",
           distance:
-            90 /
-            ((100 + zoomData.yAxisZoomEnd - zoomData.yAxisZoomStart) / 100), // 90px from bar right / (100 + (data zoom percent on y axis) / 100))
+            90 / ((100 + zoomData.yAxis.end - zoomData.yAxis.start) / 100), // 90px from bar right / (100 + (data zoom percent on y axis) / 100))
         },
       },
       {

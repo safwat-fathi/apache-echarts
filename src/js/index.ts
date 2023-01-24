@@ -39,15 +39,30 @@ chart &&
 
 // data zoom points
 export const zoomData = {
-  xAxisZoomStart: 40,
-  xAxisZoomEnd: 92.9,
-  yAxisZoomStart: 0,
-  yAxisZoomEnd: 30,
+  xAxis: {
+    start: 40,
+    end: 92.9,
+    minSpan: 12.5,
+    maxSpan: 60,
+  },
+  yAxis: { start: 0, end: 30, minSpan: 12.5, maxSpan: 60 },
 };
 console.log("🚀 ~ zoomData", zoomData);
 let subAxisType: "quarter" | "month" | "semester" = "quarter";
 
 chart.on("dataZoom", (e: any) => dataZoomHandler(e));
+
+// chart.on("dataZoom", (e: any) => {
+//   if (e.dataZoomId === "scrollY") {
+//     zoomData.yAxis.start = e.start;
+//     zoomData.yAxis.end = e.end;
+//   }
+
+//   if (e.dataZoomId === "scrollX") {
+//     zoomData.xAxis.start = e.start;
+//     zoomData.xAxis.end = e.end;
+//   }
+// });
 
 const option: EChartsOption = {
   animation: true,
@@ -95,11 +110,11 @@ const option: EChartsOption = {
       width: 10, // width of slider
       bottom: 35, //
       handleSize: "300%",
-      start: zoomData.yAxisZoomStart,
-      end: zoomData.yAxisZoomEnd,
+      start: zoomData.yAxis.start,
+      end: zoomData.yAxis.end,
       showDetail: false,
-      minSpan: 35, // min zoom limit
-      maxSpan: 80, // max zoom limit
+      minSpan: zoomData.yAxis.minSpan,
+      maxSpan: zoomData.yAxis.maxSpan,
       filterMode: "none",
     },
     // Y axis scroll inside grid
@@ -108,8 +123,8 @@ const option: EChartsOption = {
       id: "insideY",
       yAxisIndex: 0,
       top: 100,
-      start: zoomData.yAxisZoomStart,
-      end: zoomData.yAxisZoomEnd,
+      start: zoomData.xAxis.start,
+      end: zoomData.xAxis.end,
       zoomOnMouseWheel: false,
       moveOnMouseMove: true,
       moveOnMouseWheel: true,
@@ -125,11 +140,11 @@ const option: EChartsOption = {
       right: 30,
       bottom: 20,
       handleSize: "300%",
-      start: zoomData.xAxisZoomStart,
-      end: zoomData.xAxisZoomEnd,
+      start: zoomData.xAxis.start,
+      end: zoomData.xAxis.end,
       showDetail: false,
-      minSpan: 12.5, // min zoom limit
-      maxSpan: 60, // max zoom limit
+      minSpan: zoomData.xAxis.minSpan,
+      maxSpan: zoomData.xAxis.maxSpan,
       filterMode: "none",
     },
   ],
@@ -316,12 +331,12 @@ window.addEventListener("click", (e: Event) => {
     const dataZoom: any = option.dataZoom;
 
     // keep data zoom values across changes
-    dataZoom[0].start = dataZoom.yAxisZoomStart;
-    dataZoom[0].end = dataZoom.yAxisZoomEnd;
-    dataZoom[1].start = dataZoom.yAxisZoomStart;
-    dataZoom[1].end = dataZoom.yAxisZoomEnd;
-    dataZoom[2].start = dataZoom.xAxisZoomStart;
-    dataZoom[2].end = dataZoom.xAxisZoomEnd;
+    dataZoom[0].start = zoomData.yAxis.start;
+    dataZoom[0].end = zoomData.yAxis.end;
+    dataZoom[1].start = zoomData.yAxis.start;
+    dataZoom[1].end = zoomData.yAxis.end;
+    dataZoom[2].start = zoomData.xAxis.start;
+    dataZoom[2].end = zoomData.xAxis.end;
 
     if (e.target === domElements.semesterBtn) {
       domElements.semesterBtn?.classList.add("active");
