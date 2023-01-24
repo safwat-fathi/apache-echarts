@@ -1,8 +1,8 @@
 import * as echarts from "echarts";
-import { chartWidth, yAxisZoomEnd, yAxisZoomStart } from ".";
+import { chartWidth, zoomData } from ".";
 import { empData } from "../../data";
+import { COLORS } from "./constants";
 // import data from "../../data.json";
-// import { chart } from ".";
 
 type RenderItemParams = echarts.CustomSeriesRenderItemParams;
 type RenderItemAPI = echarts.CustomSeriesRenderItemAPI;
@@ -64,21 +64,44 @@ export const extractNames = (data: any[]): any[] => {
   return names;
 };
 
-const fillColor = (percent: number) => {
-  const COLORS = {
-    completed: "#98e464",
-    inProgress: "#47c0f4",
-    delayed: "#fba606",
-    notStarted: "#9193fc",
-  };
+export const dataZoomHandler = (e: any) => {
+  console.log("event:", e);
+  console.log("zoomData", zoomData);
 
+  zoomData.xAxisZoomStart = e.start;
+  zoomData.xAxisZoomEnd = e.end;
+  zoomData.yAxisZoomStart = e.start;
+  zoomData.yAxisZoomEnd = e.end;
+
+  if (e.dataZoomId === "scrollY") {
+    zoomData.yAxisZoomStart = e.start;
+    zoomData.yAxisZoomEnd = e.end;
+  }
+
+  if (e.dataZoomId === "scrollX") {
+    zoomData.xAxisZoomStart = e.start;
+    zoomData.xAxisZoomEnd = e.end;
+  }
+
+  console.log("zoomData", zoomData);
+};
+
+const fillColor = (
+  percent: number,
+  colors: {
+    completed: string;
+    inProgress: string;
+    delayed: string;
+    notStarted: string;
+  }
+) => {
   return percent === 0
-    ? COLORS.notStarted
+    ? colors.notStarted
     : percent <= 50
-    ? COLORS.delayed
+    ? colors.delayed
     : percent === 100
-    ? COLORS.completed
-    : COLORS.inProgress;
+    ? colors.completed
+    : colors.inProgress;
 };
 
 export const subXAxisLabelFormatter = (
@@ -125,13 +148,6 @@ export const renderGanttItem = (
     chartWidth - x > 100 + mainTextWidth * 2 ? `${percentage}%` : "";
 
   const imagePosition = x + barWidth + 20;
-  // const textPosition = y + height / 2 - textPositionConstant;
-  // let empNameHeight = echarts.format.getTextRect(`${employeeName}`).height;
-  // const textPosition = y + height * textPositionConstant;
-  // const textPosition = start[1] - height / 4;
-  const textPosition = y;
-  // console.log("🚀 ~ y + height", y + height);
-  // console.log("🚀 ~ empNameHeight", empNameHeight / 2);
 
   const rectShape = echarts.graphic.clipRectByRect(
     {
@@ -214,7 +230,9 @@ export const renderGanttItem = (
         },
         textConfig: {
           position: "right",
-          distance: 90 / ((100 + yAxisZoomEnd - yAxisZoomStart) / 100),
+          distance:
+            90 /
+            ((100 + zoomData.yAxisZoomEnd - zoomData.yAxisZoomStart) / 100), // 90px from bar right / (100 + (data zoom percent on y axis) / 100))
         },
       },
       {
@@ -222,7 +240,7 @@ export const renderGanttItem = (
         ignore: !rectPercent,
         shape: { ...rectPercent, r: 6 },
         style: {
-          fill: String(fillColor(+percentage)),
+          fill: String(fillColor(+percentage, COLORS)),
           stroke: "transparent",
         },
         textContent: {
@@ -237,7 +255,6 @@ export const renderGanttItem = (
         },
         textConfig: {
           position: "insideLeft",
-          // distance: 15,
         },
       },
       {

@@ -4,7 +4,7 @@
 	// - toggle legend color if clicked
 	- colors on hover on bars (maybe add border on bars if hovered)
 	- centering images
-	- update chart y axis on series toggled from legend 
+	- update chart y axis on series toggled from legend
 	- meet UI
 		- clip path to images as circle
 
@@ -20,60 +20,34 @@ import {
   filterXAxis,
   renderGanttItem,
   subXAxisLabelFormatter,
+  dataZoomHandler,
 } from "./helpers";
+import { domElements, MIN, MAX } from "./constants";
 import { empData } from "../../data";
 
 type EChartsOption = echarts.EChartsOption;
 
-/* DOM elements */
+const chart = echarts.init(domElements.chartDom);
 
-// chart container
-const chartDom = <HTMLElement>document.getElementById("chart");
-// buttons
-const semesterBtn = document.getElementById("semesterly");
-const quarterBtn = document.getElementById("quarterly");
-const monthBtn = document.getElementById("monthly");
-// legends
-const inProgressLegend = document.getElementById("in-progress");
-const delayedLegend = document.getElementById("delayed");
-const completedLegend = document.getElementById("completed");
-const notStartedLegend = document.getElementById("not-started");
-
-const chart = echarts.init(chartDom);
 export const chartWidth = chart.getWidth();
 
 // observe resize of chart parent
 chart &&
   new ResizeObserver(() => {
     chart.resize();
-  }).observe(chartDom);
+  }).observe(domElements.chartDom);
 
-// globals
-const MIN = "2009";
-const MAX = "2023";
-
-export let xAxisZoomStart = 40;
-export let xAxisZoomEnd = 92.9;
-export let yAxisZoomStart = 0;
-export let yAxisZoomEnd = 30;
-
+// data zoom points
+export const zoomData = {
+  xAxisZoomStart: 40,
+  xAxisZoomEnd: 92.9,
+  yAxisZoomStart: 0,
+  yAxisZoomEnd: 30,
+};
+console.log("🚀 ~ zoomData", zoomData);
 let subAxisType: "quarter" | "month" | "semester" = "quarter";
 
-chart.on("dataZoom", (e: any) => {
-  // console.log("event:", e);
-
-  if (e.dataZoomId === "scrollY") {
-    yAxisZoomStart = e.start;
-    yAxisZoomEnd = e.end;
-  }
-
-  if (e.dataZoomId === "scrollX") {
-    xAxisZoomStart = e.start;
-    xAxisZoomEnd = e.end;
-  }
-
-  // console.log("percent", yAxisZoomEnd - yAxisZoomStart);
-});
+chart.on("dataZoom", (e: any) => dataZoomHandler(e));
 
 const option: EChartsOption = {
   animation: true,
@@ -118,17 +92,14 @@ const option: EChartsOption = {
       type: "slider",
       id: "scrollY",
       yAxisIndex: 0,
-      width: 10,
-      // height: 600,
-      right: 10,
-      // top: 85,
-      bottom: 35,
+      width: 10, // width of slider
+      bottom: 35, //
       handleSize: "300%",
-      start: yAxisZoomStart,
-      end: yAxisZoomEnd,
+      start: zoomData.yAxisZoomStart,
+      end: zoomData.yAxisZoomEnd,
       showDetail: false,
-      minSpan: 35,
-      maxSpan: 80,
+      minSpan: 35, // min zoom limit
+      maxSpan: 80, // max zoom limit
       filterMode: "none",
     },
     // Y axis scroll inside grid
@@ -137,8 +108,8 @@ const option: EChartsOption = {
       id: "insideY",
       yAxisIndex: 0,
       top: 100,
-      start: yAxisZoomStart,
-      end: yAxisZoomEnd,
+      start: zoomData.yAxisZoomStart,
+      end: zoomData.yAxisZoomEnd,
       zoomOnMouseWheel: false,
       moveOnMouseMove: true,
       moveOnMouseWheel: true,
@@ -154,11 +125,11 @@ const option: EChartsOption = {
       right: 30,
       bottom: 20,
       handleSize: "300%",
-      start: xAxisZoomStart,
-      end: xAxisZoomEnd,
+      start: zoomData.xAxisZoomStart,
+      end: zoomData.xAxisZoomEnd,
       showDetail: false,
-      minSpan: 12.5,
-      maxSpan: 60,
+      minSpan: 12.5, // min zoom limit
+      maxSpan: 60, // max zoom limit
       filterMode: "none",
     },
   ],
@@ -174,10 +145,6 @@ const option: EChartsOption = {
       // * day = 60 * 60 * 1000 * 24
       // * month = day * 30
       // * quarter = month * 4
-      // minInterval: 60 * 60 * 1000 * 24 * 30 * 4,
-      // maxInterval: 60 * 60 * 1000 * 24 * 30 * 4,
-      // interval: 12,
-      // splitNumber: 1,
       axisTick: { show: false },
       offset: 40,
       axisLabel: {
@@ -219,9 +186,11 @@ const option: EChartsOption = {
       position: "top",
       splitLine: {
         show: true,
-        interval: function (_, value: string) {
-          return value === "Q1" || value === "H1" ? true : false;
-        },
+        // interval: function (_, value: string) {
+        //   return value === "Q1" || value === "SEMESTER1" || value === "Jan"
+        //     ? true
+        //     : false;
+        // },
       },
       offset: 0,
       axisLabel: {
@@ -233,7 +202,7 @@ const option: EChartsOption = {
     },
   ],
   yAxis: {
-    type: "category",
+    // type: "category",
     // boundaryGap: ["1%", "1%"],
     boundaryGap: true,
     min: -1,
@@ -257,7 +226,7 @@ const option: EChartsOption = {
       //   image:
       //     '"https://pbs.twimg.com/profile_images/1329949157486854150/2vhx3rm9_400x400.jpg"',
       // },
-      formatter: (value: any) => `${value}`,
+      // formatter: (value: any) => `${value}`,
     },
   },
   series: [
@@ -267,7 +236,7 @@ const option: EChartsOption = {
       // select: false,
       data: filterXAxis("not-started", empData),
       encode: {
-        x: [1, 2],
+        x: [1, 2], // reference of [date start, date end]
         y: 0, // reference of index
       },
       xAxisIndex: 0,
@@ -336,22 +305,26 @@ window.addEventListener("click", (e: Event) => {
   const target = <Element>e.target;
 
   // toggle active class
-  if (target === semesterBtn || target === monthBtn || target === quarterBtn) {
+  if (
+    target === domElements.semesterBtn ||
+    target === domElements.monthBtn ||
+    target === domElements.quarterBtn
+  ) {
     document.querySelector(".active")?.classList.remove("active");
 
     const xAxis: any = option.xAxis;
     const dataZoom: any = option.dataZoom;
 
     // keep data zoom values across changes
-    dataZoom[0].start = yAxisZoomStart;
-    dataZoom[0].end = yAxisZoomEnd;
-    dataZoom[1].start = yAxisZoomStart;
-    dataZoom[1].end = yAxisZoomEnd;
-    dataZoom[2].start = xAxisZoomStart;
-    dataZoom[2].end = xAxisZoomEnd;
+    dataZoom[0].start = dataZoom.yAxisZoomStart;
+    dataZoom[0].end = dataZoom.yAxisZoomEnd;
+    dataZoom[1].start = dataZoom.yAxisZoomStart;
+    dataZoom[1].end = dataZoom.yAxisZoomEnd;
+    dataZoom[2].start = dataZoom.xAxisZoomStart;
+    dataZoom[2].end = dataZoom.xAxisZoomEnd;
 
-    if (e.target === semesterBtn) {
-      semesterBtn?.classList.add("active");
+    if (e.target === domElements.semesterBtn) {
+      domElements.semesterBtn?.classList.add("active");
 
       subAxisType = "semester";
 
@@ -364,8 +337,8 @@ window.addEventListener("click", (e: Event) => {
       chart.setOption({ ...option, xAxis, dataZoom });
     }
 
-    if (e.target === quarterBtn) {
-      quarterBtn?.classList.add("active");
+    if (e.target === domElements.quarterBtn) {
+      domElements.quarterBtn?.classList.add("active");
 
       subAxisType = "quarter";
 
@@ -376,8 +349,8 @@ window.addEventListener("click", (e: Event) => {
       chart.setOption({ ...option, xAxis, dataZoom });
     }
 
-    if (e.target === monthBtn) {
-      monthBtn?.classList.add("active");
+    if (e.target === domElements.monthBtn) {
+      domElements.monthBtn?.classList.add("active");
 
       subAxisType = "month";
 
@@ -436,17 +409,20 @@ window.addEventListener("click", (e: Event) => {
 });
 
 // toggle highlight series on legend hover
-[inProgressLegend, notStartedLegend, completedLegend, delayedLegend].forEach(
-  el => {
-    if (el) {
-      el.addEventListener("mouseenter", _ => {
-        console.log(el.id);
-        chart.dispatchAction({ type: "highlight", seriesName: el.id });
-      });
+[
+  domElements.inProgressLegend,
+  domElements.notStartedLegend,
+  domElements.completedLegend,
+  domElements.delayedLegend,
+].forEach(el => {
+  if (el) {
+    el.addEventListener("mouseenter", _ => {
+      console.log(el.id);
+      chart.dispatchAction({ type: "highlight", seriesName: el.id });
+    });
 
-      el.addEventListener("mouseleave", _ => {
-        chart.dispatchAction({ type: "downplay", seriesName: el.id });
-      });
-    }
+    el.addEventListener("mouseleave", _ => {
+      chart.dispatchAction({ type: "downplay", seriesName: el.id });
+    });
   }
-);
+});
